@@ -36,9 +36,13 @@ class Window(QWidget):
               console.log(kiwoom.commRqData("Request1", "opt10001", 0, "0101"));
             });
             document.addEventListener("kiwoom:receiveTR", function(e) {
-              console.log(e.type, e.detail);
-              console.log(kiwoom.commGetData(e.detail.trCode, "", 0, e.detail.rQName, 0, "종목명"));
-              console.log(kiwoom.commGetData(e.detail.trCode, "", 0, e.detail.rQName, 0, "거래량"));
+              var data = e.detail;
+              console.log(e.type, data);
+
+              console.log(data.rQName, data.trCode);
+
+              console.log(kiwoom.commGetData(data.trCode, "", data.rQName, 0, "종목명"));
+              console.log(kiwoom.commGetData(data.trCode, "", data.rQName, 0, "거래량"));
             });
             function updateEntry() {
                 setInterval(function() {

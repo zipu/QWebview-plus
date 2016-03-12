@@ -52,6 +52,7 @@ class Kiwoom(QObject):
 			name = self.ocx.dynamicCall("CommGetData(QString, QString, QString, int, QString)", trCode, "", rQName, 0, "종목명")
 			volume = self.ocx.dynamicCall("CommGetData(QString, QString, QString, int, QString)", trCode, "", rQName, 0, "거래량")
 			print(name,volume)
+			print("같은거", self.commGetData(trCode, "", rQName, 0, "종목명"))
 			self.fireEvent("kiwoom:receiveTR", {
 				"scrNo" : scrNo,
 				"rQName" : rQName,
@@ -80,4 +81,5 @@ class Kiwoom(QObject):
 	# Tran 데이터, 실시간 데이터, 체결잔고 데이터를 반환한다.
 	@pyqtSlot(str, str, str, int, str, result=str)
 	def commGetData(self, trCode, realType, fieldName, index, innerFieldName):
+		print("js", trCode, realType, fieldName, index, innerFieldName)
 		return self.ocx.dynamicCall("CommGetData(QString, QString, QString, int, QString)", trCode, realType, fieldName, index, innerFieldName)
