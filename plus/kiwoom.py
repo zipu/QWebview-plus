@@ -2,18 +2,6 @@
 from PyQt4.QtCore import *
 from PyQt4.QAxContainer import *
 from PyQt4.QtGui import QApplication
-from plus import WebViewPlus
-
-class KiwoomWebViewPlus(WebViewPlus):
-	"""
-	키움 전용 Webview
-	"""
-	def __init__(self):
-		super().__init__()
-		self._kiwoom = Kiwoom(self)
-		self._mf = self.page().mainFrame()
-		self._mf.addToJavaScriptWindowObject("kiwoom", self._kiwoom)
-
 
 class Kiwoom(QObject):
 	# http://stackoverflow.com/questions/2490825/how-to-trigger-event-in-javascript

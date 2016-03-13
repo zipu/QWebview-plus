@@ -49,7 +49,16 @@ class WebPagePlus(QWebPage):
             logger = logging
         self.logger = logger
 
-
     def javaScriptConsoleMessage(self, msg, lineNumber, sourceID):
         self.logger.warning("console(%s:%d): %s" % (sourceID, lineNumber, msg))
 
+
+class KiwoomWebViewPlus(WebViewPlus):
+    """
+    키움 전용 Webview
+    """
+    def __init__(self):
+        super().__init__()
+        self._kiwoom = Kiwoom(self)
+        self._mf = self.page().mainFrame()
+        self._mf.addToJavaScriptWindowObject("kiwoom", self._kiwoom)
