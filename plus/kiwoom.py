@@ -28,6 +28,7 @@ class Kiwoom(QObject):
 
 	@pyqtSlot()
 	def quit(self):
+		self.commTerminate()
 		QApplication.quit()
 
 	# 통신 연결 상태 변경시 이벤트
@@ -51,6 +52,10 @@ class Kiwoom(QObject):
 	@pyqtSlot()
 	def commConnect(self):
 		self.ocx.dynamicCall("CommConnect()")
+
+	@pyqtSlot()
+	def commTerminate(self):
+		self.ocx.dynamicCall("CommTerminate()")
 
 	@pyqtSlot(str, str)
 	def setInputValue(self, id, value):

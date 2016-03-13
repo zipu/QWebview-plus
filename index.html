@@ -3,11 +3,10 @@
 </head>
 <body>
 <div>
-    <input type="text" id="entry" value="1"/>
-    <input type="button" value="Compute" onclick="updateEntry()"/>
+    <input type="button" value="login" onclick="login()"/>
 </div>
 <div>
-    <input type="button" value="Quit" onclick="foo.quit()"/>
+    <input type="button" value="Quit" onclick="kiwoom.quit()"/>
 </div>
 <script>
 document.addEventListener("eventConnect.kiwoom", function(e) {
@@ -19,7 +18,8 @@ document.addEventListener("receiveTrData.kiwoom", function(e) {
   console.log(kiwoom.commGetData(data.trCode, "", data.rQName, 0, "종목명"));
   console.log(kiwoom.commGetData(data.trCode, "", data.rQName, 0, "거래량"));
 });
-function updateEntry() {
+
+function login() {
     kiwoom.commConnect();
 }
 </script>
