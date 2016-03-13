@@ -1,8 +1,9 @@
 #-*-coding: utf-8 -*-
 import sys
+import os.path
 from PyQt4.QtCore import *
 from PyQt4.QtGui import QWidget, QSplitter, QVBoxLayout, QApplication
-from plus.web import KiwoomWebViewPlus
+from plus.kiwoom import KiwoomWebViewPlus
 
 class Window(QWidget):
     def __init__(self):
@@ -16,12 +17,19 @@ class Window(QWidget):
         self.splitter.addWidget(self.view)
         self.splitter.addWidget(self.view.webInspector)
 
-def main():
-    app = QApplication(sys.argv)
-    window = Window()
-    window.view.setHtml(open(sys.argv[1]).read())
-    window.show()
-    app.exec_()
 
 if __name__ == "__main__":
-    main()
+
+    if len(sys.argv) < 2:
+        entryfle = "index.html" if os.path.isfile("index.html") else ""
+    else:
+        entryfle = sys.argv[1]
+
+    if entryfle:
+        app = QApplication(sys.argv)
+        window = Window()
+        window.view.setHtml(open(entryfle, encoding="utf8").read())
+        window.show()
+        app.exec_()
+    else:
+        print("진입 페이지를 지정해 주세요")

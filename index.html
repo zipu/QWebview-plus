@@ -10,24 +10,16 @@
     <input type="button" value="Quit" onclick="foo.quit()"/>
 </div>
 <script>
-document.addEventListener("kiwoom:connect", function(e) {
-  console.log(e.type, e.detail);
+document.addEventListener("eventConnect.kiwoom", function(e) {
   kiwoom.setInputValue("종목코드", "000660");
-  console.log(kiwoom.commRqData("Request1", "opt10001", 0, "0101"));
+  kiwoom.commRqData("Request1", "opt10001", 0, "0101");
 });
-document.addEventListener("kiwoom:receiveTR", function(e) {
+document.addEventListener("receiveTrData.kiwoom", function(e) {
   var data = e.detail;
-  console.log(e.type, data);
-
-  console.log(data.rQName, data.trCode);
-
   console.log(kiwoom.commGetData(data.trCode, "", data.rQName, 0, "종목명"));
   console.log(kiwoom.commGetData(data.trCode, "", data.rQName, 0, "거래량"));
 });
 function updateEntry() {
-    setInterval(function() {
-        console.log("test...");
-    },1000);
     kiwoom.commConnect();
 }
 </script>
