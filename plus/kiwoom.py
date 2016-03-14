@@ -20,11 +20,9 @@ class Kiwoom(QObject):
 		self.view = view
 		self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
 
-		# 로그인 접속 여부 이벤트
 		self.ocx.connect(self.ocx, SIGNAL("OnEventConnect(int)"), self._OnEventConnect)
-
-		# receive data
 		self.ocx.connect(self.ocx, SIGNAL("OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"), self._OnReceiveTrData)
+		self.ocx.connect(self.ocx, SIGNAL("OnReceiveTrData(QString, QString, QString)"), self._OnReceiveRealData)
 
 	@pyqtSlot()
 	def quit(self):
@@ -49,6 +47,14 @@ class Kiwoom(QObject):
 			"splmMsg" : splmMsg
 		})
 
+	# 실시간 시세 이벤트
+	def _OnReceiveRealData(self, jongmokCode, realType, realData):
+		self.view.fireEvent("receiveRealData.kiwoom", {
+			"jongmokCode" : jongmokCode,
+			"realType" : realType,
+			"realData": realData
+		})
+
 	@pyqtSlot()
 	def commConnect(self):
 		self.ocx.dynamicCall("CommConnect()")
@@ -62,11 +68,81 @@ class Kiwoom(QObject):
 		self.ocx.dynamicCall("SetInputValue(QString, QString)", id, value)
 
 	# 통신 데이터를 송신한다.
+# OP_ERR_SISE_OVERFLOW – 과도한 시세조회로 인한 통신불가
+# OP_ERR_RQ_STRUCT_FAIL – 입력 구조체 생성 실패
+# OP_ERR_RQ_STRING_FAIL – 요청전문 작성 실패
+# OP_ERR_NONE – 정상처리
 	@pyqtSlot(str, str, int, str, result=int)
 	def commRqData(self, rQName, trCode, prevNext, screenNo):
 		return self.ocx.dynamicCall("CommRqData(QString, QString, int, QString)", rQName, trCode, prevNext, screenNo)
 
+
 	# Tran 데이터, 실시간 데이터, 체결잔고 데이터를 반환한다.
+# 1. Tran 데이터
+# sJongmokCode : Tran명
+# sRealType : 사용안함
+# sFieldName : 레코드명
+# nIndex : 반복인덱스
+# sInnerFieldName: 아이템명
+#
+# 2. 실시간 데이터
+# sJongmokCode : Key Code
+# sRealType : Real Type
+# sFieldName : Item Index
+# nIndex : 사용안함
+# sInnerFieldName:사용안함
+#
+# 3. 체결 데이터
+# sJongmokCode : 체결구분
+# sRealType : “-1”
+# sFieldName : 사용안함
+# nIndex : ItemIndex
+# sInnerFieldName:사용안함
 	@pyqtSlot(str, str, str, int, str, result=str)
 	def commGetData(self, jongmokCode, realType, fieldName, index, innerFieldName):
 		return self.ocx.dynamicCall("CommGetData(QString, QString, QString, int, QString)", jongmokCode, realType, fieldName, index, innerFieldName).strip()
+
+	# 실시간데이터를 반환한다.
+	@pyqtSlot(str, int, result=str)
+	def getCommRealData(self, realType, fid):
+		return self.ocx.dynamicCall("GetCommRealData(QString, int)",realType, fid)
+
+	# 로그인한 사용자 정보를 반환한다.
+# “ACCOUNT_CNT” – 전체 계좌 개수를 반환한다.
+# "ACCNO" – 전체 계좌를 반환한다. 계좌별 구분은 ‘;’이다.
+# “USER_ID” - 사용자 ID를 반환한다.
+# “USER_NAME” – 사용자명을 반환한다.
+# “KEY_BSECGB” – 키보드보안 해지여부. 0:정상, 1:해지
+# “FIREW_SECGB” – 방화벽 설정 여부. 0:미설정, 1:설정, 2:해지
+	@pyqtSlot(str)
+	def getLoginInfo(self, tag):
+		self.ocx.dynamicCall("GetLoginInfo(QString)",[tag])
+
+	@pyqtSlot(str)
+	def disconnectRealData(self, scnNo):
+		self.ocx.dynamicCall("DisconnectRealData(QString)", scnNo)
+
+	# 수신 받은 데이터의 반복 개수를 반환한다.
+	@pyqtSlot(str, str)
+	def getRepeatCnt(self, trCode, recordName):
+		self.ocx.dynamicCall("GetRepeatCnt(QString, QString)", trCode, recordName)
+
+	# 복수종목조회 Tran을 서버로 송신한다.
+# OP_ERR_RQ_STRING – 요청 전문 작성 실패
+# OP_ERR_NONE - 정상처리
+#
+# sArrCode – 종목간 구분은 ‘;’이다.
+# nTypeFlag – 0:주식관심종목정보, 3:선물옵션관심종목정보
+	@pyqtSlot(str, bool, int, int, str, str)
+	def commKwRqData(self, arrCode, next, codeCount, typeFlag, rQName, screenNo):
+		self.ocx.dynamicCall("CommKwRqData(QString, QBoolean, int, int, QString, QString)", arrCode, next, codeCount, typeFlag, rQName, screenNo)
+
+	# 실시간 등록을 한다.
+	@pyqtSlot(str, str, str, str)
+	def setRealReg(self, screenNo, codeList, fidList, realType):
+		self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)", screenNo, codeList, fidList, realType)
+
+	# 종목별 실시간 해제
+	@pyqtSlot(str, str)
+	def setRealRemove(self, scrNo, delCode):
+		self.ocx.dynamicCall("SetRealRemove(QString, QString)", scrNo, delCode)
