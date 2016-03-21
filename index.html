@@ -1,26 +1,84 @@
 <html>
 <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi">
+<script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=" crossorigin="anonymous"></script>
 </head>
 <body>
 <div>
-    <input type="button" value="login" onclick="login()"/>
-</div>
-<div>
-    <input type="button" value="Quit" onclick="kiwoom.quit()"/>
+    <label>종목코드</label><input type="text" id="stockcode" value="003000" />
+    <button id="search">종목 검색</button>
 </div>
 <script>
+var $code = $("#stockcode");
 document.addEventListener("eventConnect.kiwoom", function(e) {
-  kiwoom.setInputValue("종목코드", "000660");
-  kiwoom.commRqData("Request1", "opt10001", 0, "0101");
-});
-document.addEventListener("receiveTrData.kiwoom", function(e) {
-  var data = e.detail;
-  console.log(kiwoom.commGetData(data.trCode, "", data.rQName, 0, "종목명"));
-  console.log(kiwoom.commGetData(data.trCode, "", data.rQName, 0, "거래량"));
+    var errcode = e.detail;
+    if(errcode == 0) {
+        console.info("로그인 완료");
+        console.log(kiwoom.getLoginInfo("ACCNO").replace(/;$/,"").split(";"));
+        search();
+    } else {
+        console.error(kiwoom.parseErrorCode(errcode));
+    }
 });
 
-function login() {
-    kiwoom.commConnect();
+document.addEventListener("receiveMsg.kiwoom", function(e) {
+    var data = e.detail;
+    console.info({
+        "scrNo" : data.scrNo,
+        "rQName" : data.rQName,
+        "trCode": data.trCode,
+        "msg" : data.msg
+    });
+});
+
+document.addEventListener("receiveTrData.kiwoom", function(e) {
+    var data = e.detail;
+    var len = kiwoom.getRepeatCnt(data.trCode, data.rQName);
+    console.info( data.rQName, data.trCode, len );
+
+    switch(data.trCode) {
+        case "opt10001" :
+            for(var i=0; i<len; i++) {
+                console.log("TR 데이터",{
+                    // "종목명" : kiwoom.commGetData(data.trCode, "", data.rQName, i, "종목명"),
+                    // "시가총액" : kiwoom.commGetData(data.trCode, "", data.rQName, i, "시가총액"),
+                    // "거래량" : kiwoom.commGetData(data.trCode, "", data.rQName, i, "거래량"),
+                    // "현재가" : kiwoom.commGetData(data.trCode, "", data.rQName, i, "현재가")
+                    "종목명" : kiwoom.plusGetTrData(data.trCode, data.rQName, i, "종목명"),
+                    "시가총액" : kiwoom.plusGetTrData(data.trCode, data.rQName, i, "시가총액"),
+                    "거래량" : kiwoom.plusGetTrData(data.trCode, data.rQName, i, "거래량"),
+                    "현재가" : kiwoom.plusGetTrData(data.trCode, data.rQName, i, "현재가")
+                });
+            }
+            break;
+    }
+});
+
+document.addEventListener("receiveRealData.kiwoom", function(e) {
+    var data = e.detail;
+    console.info("실시간데이터", {
+        "jongmokCode" : data.jongmokCode,
+        "realType" : data.realType,
+        "realData": data.realData
+    });
+    console.log(kiwoom.plusGetRealData(data.jongmokCode, data.realType, 10));
+});
+
+$("#search").click(function(e) {
+    var status = kiwoom.getConnectState();
+    if(status == 0) {
+        kiwoom.commConnect();
+    } else if(status == 1) {
+        search();
+    }
+});
+
+// 종목 TR 검색
+function search() {
+    kiwoom.setInputValue("종목코드", $code.val());
+    // rQName과 화면번호는 사용자가 지정하여 구분하는 값
+    kiwoom.commRqData("주식기본정보", "opt10001", 0, "0001");
 }
 </script>
 

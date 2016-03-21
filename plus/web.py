@@ -36,7 +36,7 @@ class WebViewPlus(QWebView):
         shortcut = QShortcut(self)
         shortcut.setKey(Qt.Key_F12)
         shortcut.activated.connect(self._toggleInspector)
-        self.webInspector.setVisible(False)
+        self.webInspector.setVisible(True)
 
     def _toggleInspector(self):
         """
