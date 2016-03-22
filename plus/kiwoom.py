@@ -7,14 +7,17 @@ from plus import util
 import json
 
 class KiwoomWebViewPlus(WebViewPlus):
-    """
-    키움 전용 Webview
-    """
-    def __init__(self):
-        super().__init__()
-        self._kiwoom = Kiwoom(self)
-        self._mf = self.page().mainFrame()
-        self._mf.addToJavaScriptWindowObject("kiwoom", self._kiwoom)
+	"""
+	키움 전용 Webview
+	"""
+	def __init__(self):
+		super().__init__()
+		self._kiwoom = Kiwoom(self)
+		self.loadFinished.connect(self._OnLoadFinished)
+
+	def _OnLoadFinished(self):
+		self.page().mainFrame().addToJavaScriptWindowObject("kiwoom", self._kiwoom)
+
 
 class Kiwoom(QObject):
 	def __init__(self, view):
