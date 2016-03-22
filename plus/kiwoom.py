@@ -4,6 +4,7 @@ from PyQt4.QAxContainer import QAxWidget
 from PyQt4.QtGui import QApplication
 from plus.web import WebViewPlus
 from plus import util
+import json
 
 class KiwoomWebViewPlus(WebViewPlus):
     """
@@ -25,7 +26,9 @@ class Kiwoom(QObject):
 		self.ocx.connect(self.ocx, SIGNAL("OnReceiveMsg(QString, QString, QString, QString)"), self._OnReceiveMsg)
 		self.ocx.connect(self.ocx, SIGNAL("OnReceiveRealData(QString, QString, QString)"), self._OnReceiveRealData)
 		self.ocx.connect(self.ocx, SIGNAL("OnReceiveChejanData(QString, int, QString)"), self._OnReceiveChejanData)
-
+		self.ocx.connect(self.ocx, SIGNAL("OnReceiveConditionVer(bool, QString)"), self._OnReceiveConditionVer)
+		self.ocx.connect(self.ocx, SIGNAL("OnReceiveTrCondition(QString, QString, QString, int, int)"), self._OnReceiveTrCondition)
+		self.ocx.connect(self.ocx, SIGNAL("OnReceiveRealCondition(QString, QString, QString, QString)"), self._OnReceiveRealCondition)
 
 	@pyqtSlot()
 	def quit(self):
@@ -86,6 +89,41 @@ class Kiwoom(QObject):
 			"gubun" : gubun,
 			"itemCnt" : itemCnt,
 			"fidList": fidList
+		})
+
+	# 로컬에 사용자조건식 저장 성공여부 응답 이벤트
+	def _OnReceiveConditionVer(self, ret, msg):
+		self.view.fireEvent("receiveConditionVer.kiwoom", {
+			"ret" : ret,
+			"msg" : msg
+		})
+
+	# 조건검색 조회응답으로 종목리스트를 구분자(“;”)로 붙어서 받는 시점.
+	# LPCTSTR sScrNo : 종목코드
+	# LPCTSTR strCodeList : 종목리스트(“;”로 구분)
+	# LPCTSTR strConditionName : 조건명
+	# int nIndex : 조건명 인덱스
+	# int nNext : 연속조회(2:연속조회, 0:연속조회없음)
+	def _OnReceiveTrCondition(self, scrNo, codeList, conditionName, index, next):
+		self.view.fireEvent("receiveTrCondition.kiwoom", {
+			"scrNo" : scrNo,
+			"codeList" : codeList,
+			"conditionName" : conditionName,
+			"index" : index,
+			"next" : next,
+		})
+
+	# 편입, 이탈 종목이 실시간으로 들어옵니다.
+	# strCode : 종목코드
+	# strType : 편입(“I”), 이탈(“D”)
+	# strConditionName : 조건명
+	# strConditionIndex : 조건명 인덱스
+	def _OnReceiveRealCondition(self, code, type, conditionName, conditionIndex):
+		self.view.fireEvent("receiveRealCondition.kiwoom", {
+			"code" : code,
+			"type" : type,
+			"conditionName" : conditionName,
+			"conditionIndex" : conditionIndex
 		})
 
 	# 로그인
@@ -200,6 +238,34 @@ class Kiwoom(QObject):
 	def getChejanData(self, fid):
 		return self.ocx.dynamicCall("GetChejanData(int)", fid)
 
+	# 서버에 저장된 사용자 조건식을 가져온다.
+	@pyqtSlot(result=int)
+	def getConditionLoad(self):
+		return self.ocx.dynamicCall("GetConditionLoad()")
+
+	# 조건검색 조건명 리스트를 받아온다.
+	# 조건명 리스트(인덱스^조건명)
+	# 조건명 리스트를 구분(“;”)하여 받아온다
+	@pyqtSlot(result=str)
+	def getConditionNameList(self):
+		return self.ocx.dynamicCall("GetConditionNameList()")
+
+	# 조건검색 종목조회TR송신한다.
+	# LPCTSTR strScrNo : 화면번호
+	# LPCTSTR strConditionName : 조건명
+	# int nIndex : 조건명인덱스
+	# int nSearch : 조회구분(0:일반조회, 1:실시간조회, 2:연속조회)
+	# 1:실시간조회의 화면 개수의 최대는 10개
+	@pyqtSlot(str, str, int, int)
+	def sendCondition(self, scrNo, conditionName, index, search):
+		self.ocx.dynamicCall("SendCondition(QString,QString, int, int)", scrNo, conditionName, index, search)
+
+	# 실시간 조건검색을 중지합니다.
+	# ※ 화면당 실시간 조건검색은 최대 10개로 제한되어 있어서 더 이상 실시간 조건검색을 원하지 않는 조건은 중지해야만 카운트 되지 않습니다.
+	@pyqtSlot(str, str, int)
+	def sendConditionStop(self, scrNo, conditionName, index):
+		self.ocx.dynamicCall("SendConditionStop(QString, QString, int)", scrNo, conditionName, index)
+
 
 	# 복수종목조회 Tran을 서버로 송신한다.
 	# OP_ERR_RQ_STRING – 요청 전문 작성 실패
@@ -207,20 +273,56 @@ class Kiwoom(QObject):
 	#
 	# sArrCode – 종목간 구분은 ‘;’이다.
 	# nTypeFlag – 0:주식관심종목정보, 3:선물옵션관심종목정보
-	@pyqtSlot(str, bool, int, int, str, str)
-	def commKwRqData(self, arrCode, next, codeCount, typeFlag, rQName, screenNo):
-		self.ocx.dynamicCall("CommKwRqData(QString, QBoolean, int, int, QString, QString)", arrCode, next, codeCount, typeFlag, rQName, screenNo)
+	# @pyqtSlot(str, bool, int, int, str, str)
+	# def commKwRqData(self, arrCode, next, codeCount, typeFlag, rQName, screenNo):
+	# 	self.ocx.dynamicCall("CommKwRqData(QString, QBoolean, int, int, QString, QString)", arrCode, next, codeCount, typeFlag, rQName, screenNo)
 
-	# # 실시간 등록을 한다.
-	# @pyqtSlot(str, str, str, str)
-	# def setRealReg(self, screenNo, codeList, fidList, realType):
-	# 	self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)", screenNo, codeList, fidList, realType)
-    #
-	# @pyqtSlot(str)
-	# def disconnectRealData(self, scnNo):
-	# 	self.ocx.dynamicCall("DisconnectRealData(QString)", scnNo)
-    #
-	# # 종목별 실시간 해제
-	# @pyqtSlot(str, str)
-	# def setRealRemove(self, scrNo, delCode):
-	# 	self.ocx.dynamicCall("SetRealRemove(QString, QString)", scrNo, delCode)
+	# 실시간 등록을 한다.
+	# strScreenNo : 화면번호
+	# strCodeList : 종목코드리스트(ex: 039490;005930;…)
+	# strFidList : FID번호(ex:9001;10;13;…)
+	# 	9001 – 종목코드
+	# 	10 - 현재가
+	# 	13 - 누적거래량
+	# strOptType : 타입(“0”, “1”)
+	# 타입 “0”은 항상 마지막에 등록한 종목들만 실시간등록이 됩니다.
+	# 타입 “1”은 이전에 실시간 등록한 종목들과 함께 실시간을 받고 싶은 종목을 추가로 등록할 때 사용합니다.
+	# ※ 종목, FID는 각각 한번에 실시간 등록 할 수 있는 개수는 100개 입니다.
+	@pyqtSlot(str, str, str, str)
+	def setRealReg(self, screenNo, codeList, fidList, optType):
+		self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)", screenNo, codeList, fidList, realType)
+
+	# 종목별 실시간 해제
+	# strScrNo : 화면번호
+	# strDelCode : 실시간 해제할 종목코드
+	# -화면별 실시간해제
+	# 여러 화면번호로 걸린 실시간을 해제하려면 파라메터의 화면번호와 종목코드에 “ALL”로 입력하여 호출하시면 됩니다.
+	# SetRealRemove(“ALL”, “ALL”);
+	# 개별화면별로 실시간 해제 하시려면 파라메터에서 화면번호는 실시간해제할
+	# 화면번호와 종목코드에는 “ALL”로 해주시면 됩니다.
+	# SetRealRemove(“0001”, “ALL”);
+	# -화면의 종목별 실시간해제
+	# 화면의 종목별로 실시간 해제하려면 파라메터에 해당화면번호와 해제할
+	# 종목코드를 입력하시면 됩니다.
+	# SetRealRemove(“0001”, “039490”);
+	@pyqtSlot(str, str)
+	def setRealRemove(self, scrNo, delCode):
+		self.ocx.dynamicCall("SetRealRemove(QString, QString)", scrNo, delCode)
+
+	# 차트 조회한 데이터 전부를 배열로 받아온다.
+	# LPCTSTR strTrCode : 조회한TR코드
+	# LPCTSTR strRecordName: 조회한 TR명
+	# ※항목의 위치는 KOA Studio의 TR목록 순서로 데이터를 가져옵니다.
+	# 예로 OPT10080을 살펴보면 OUTPUT의 멀티데이터의 항목처럼 현재가, 거래량, 체결시간등 순으로 항목의 위치가 0부터 1씩 증가합니다.
+	@pyqtSlot(str, str, result=str)
+	def getCommDataEx(self, trCode, recordName):
+		return json.dumps(self.ocx.dynamicCall("GetCommDataEx(QString, QString)", trCode, recordName))
+
+	# 리얼 시세를 끊는다.
+	# 화면 내 모든 리얼데이터 요청을 제거한다.
+	# 화면을 종료할 때 반드시 위 함수를 호출해야 한다.
+	# Ex) openApi.DisconnectRealData(“0101”);
+	@pyqtSlot(str)
+	def disconnectRealData(self, scnNo):
+		self.ocx.dynamicCall("DisconnectRealData(QString)", scnNo)
+
