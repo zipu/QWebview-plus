@@ -21,8 +21,7 @@ class WebViewPlus(QWebView):
 
     def __init__(self):
         super().__init__()
-        _page = WebPagePlus()
-        self.setPage(_page)
+        self.setPage(WebPagePlus())
         self._setupInspector()
 
     def _setupInspector(self):

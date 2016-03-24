@@ -13,9 +13,9 @@ class KiwoomWebViewPlus(WebViewPlus):
 	def __init__(self):
 		super().__init__()
 		self._kiwoom = Kiwoom(self)
-		self.loadFinished.connect(self._OnLoadFinished)
+		self.urlChanged.connect(self._OnUrlChanged)
 
-	def _OnLoadFinished(self):
+	def _OnUrlChanged(self, url):
 		self.page().mainFrame().addToJavaScriptWindowObject("kiwoom", self._kiwoom)
 
 
