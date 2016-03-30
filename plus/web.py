@@ -1,4 +1,5 @@
 # -*-coding: utf-8 -*-
+
 import logging
 from PyQt4.QtWebKit import QWebView, QWebPage, QWebInspector, QWebSettings
 from PyQt4.QtGui import QShortcut
