@@ -20,15 +20,16 @@ class Window(QWidget):
 
     def initUI(self):
 
-        self.setMinimumSize(1024, 600)
-        self.setWindowTitle("QWebview-plus for Kiwoom")
-
-        layout = QVBoxLayout(self)
+        layout = QVBoxLayout()
         layout.setMargin(0)
         splitter = QSplitter(Qt.Vertical)
         splitter.addWidget(self.view)
         splitter.addWidget(self.view.webInspector)
         layout.addWidget(splitter)
+
+        self.setLayout(layout)
+        self.setMinimumSize(1024, 600)
+        self.setWindowTitle("QWebview-plus for Kiwoom")
 
         # window.view.setHtml(open(entryfle, encoding="utf8").read())
       
