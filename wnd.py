@@ -15,6 +15,7 @@ class Window(QWidget):
         super().__init__()
         self.view = KiwoomWebViewPlus()
         self.view.load(QUrl(entryfile))
+        self.initUI()
 
 
     def initUI(self):
@@ -30,8 +31,7 @@ class Window(QWidget):
         layout.addWidget(splitter)
 
         # window.view.setHtml(open(entryfle, encoding="utf8").read())
-        self.show()
-
+      
 def main():
     try:
         entryfile = sys.argv[1]
@@ -41,7 +41,7 @@ def main():
     if os.path.isfile(entryfile):
         app = QApplication(sys.argv)
         window = Window(entryfile)
-        window.initUI()
+        window.show()
         sys.exit(app.exec_())
 
     else:
