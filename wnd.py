@@ -24,11 +24,9 @@ class Window(QWidget):
 
         layout = QVBoxLayout(self)
         layout.setMargin(0)
-
         splitter = QSplitter(Qt.Vertical)
         splitter.addWidget(self.view)
         splitter.addWidget(self.view.webInspector)
-
         layout.addWidget(splitter)
 
         # window.view.setHtml(open(entryfle, encoding="utf8").read())
@@ -44,7 +42,6 @@ def main():
         app = QApplication(sys.argv)
         window = Window(entryfile)
         window.initUI()
-
         sys.exit(app.exec_())
 
     else:
