@@ -24,7 +24,6 @@ class Window(QWidget):
 
         layout = QVBoxLayout(self)
         layout.setMargin(0)
-
         splitter = QSplitter(Qt.Vertical)
         splitter.addWidget(self.view)
         splitter.addWidget(self.view.webInspector)
