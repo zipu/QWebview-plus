@@ -1,39 +1,54 @@
-#!/usr/bin/env python
+#pylint: disable=E0611, w0614, R0903
 #-*-coding: utf-8 -*-
+
 import sys
 import os.path
-from PyQt4.QtCore import *
+from PyQt4.QtCore import QUrl, Qt
 from PyQt4.QtGui import QWidget, QSplitter, QVBoxLayout, QApplication
 from plus.kiwoom import KiwoomWebViewPlus
 
 class Window(QWidget):
-    def __init__(self):
+    """
+    main window layout
+    """
+    def __init__(self, entryfile):
         super().__init__()
+        self.view = KiwoomWebViewPlus()
+        self.view.load(QUrl(entryfile))
+
+
+    def initUI(self):
+
         self.setMinimumSize(1024, 600)
         self.setWindowTitle("QWebview-plus for Kiwoom")
 
-        self.view = KiwoomWebViewPlus()
-        self.splitter = QSplitter(self)
-        self.splitter.setOrientation(Qt.Vertical)
         layout = QVBoxLayout(self)
         layout.setMargin(0)
-        layout.addWidget(self.splitter)
-        self.splitter.addWidget(self.view)
-        self.splitter.addWidget(self.view.webInspector)
+
+        splitter = QSplitter(Qt.Vertical)
+        splitter.addWidget(self.view)
+        splitter.addWidget(self.view.webInspector)
+
+        layout.addWidget(splitter)
+
+        # window.view.setHtml(open(entryfle, encoding="utf8").read())
+        self.show()
+
+def main():
+    try:
+        entryfile = sys.argv[1]
+    except IndexError:
+        entryfile = "index.html"
+
+    if os.path.isfile(entryfile):
+        app = QApplication(sys.argv)
+        window = Window(entryfile)
+        window.initUI()
+
+        sys.exit(app.exec_())
+
+    else:
+        sys.exit("진입 페이지를 지정해 주세요")
 
 if __name__ == "__main__":
-
-    if len(sys.argv) < 2:
-        entryfle = "index.html" if os.path.isfile("index.html") else ""
-    else:
-        entryfle = sys.argv[1]
-
-    if entryfle:
-        app = QApplication(sys.argv)
-        window = Window()
-        # window.view.setHtml(open(entryfle, encoding="utf8").read())
-        window.view.load(QUrl(entryfle))
-        window.show()
-        app.exec_()
-    else:
-        print("진입 페이지를 지정해 주세요")
+    main()
