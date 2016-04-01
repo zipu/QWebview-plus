@@ -39,6 +39,10 @@ python wnd.py [실행할 html 파일명]
 
 > 실행할 파일을 입력하지 않을 경우, 기본적으로 index.html을 부른다.
 
+## [Kiwoom-Helper](https://github.com/sculove/Kiwoom-Helper) 유틸
+QWebview-Plus에서 제공하는 kiwoom 객체와 이벤트를 손쉽게 사용할 수 있는 유틸
+> 별도의 프로젝트로 관리 https://github.com/sculove/Kiwoom-Helper
+
 ## License
 Licensed under MIT:  
 https://opensource.org/licenses/MIT
