@@ -15,11 +15,9 @@ class Window(QWidget):
         super().__init__()
         self.view = KiwoomWebViewPlus()
         self.view.load(QUrl(entryfile))
-        self.initUI()
-
-
-    def initUI(self):
-
+        self._initUI()
+        
+    def _initUI(self):
         layout = QVBoxLayout()
         layout.setMargin(0)
         splitter = QSplitter(Qt.Vertical)
@@ -32,7 +30,7 @@ class Window(QWidget):
         self.setWindowTitle("QWebview-plus for Kiwoom")
 
         # window.view.setHtml(open(entryfle, encoding="utf8").read())
-      
+
 def main():
     try:
         entryfile = sys.argv[1]
@@ -44,7 +42,6 @@ def main():
         window = Window(entryfile)
         window.show()
         sys.exit(app.exec_())
-
     else:
         sys.exit("진입 페이지를 지정해 주세요")
 
