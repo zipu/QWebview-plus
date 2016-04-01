@@ -14,7 +14,7 @@ class Window(QWidget):
 
         self.view = KiwoomWebViewPlus()
         self.splitter = QSplitter(self)
-        self.splitter.setOrientation(Qt.Vertical)
+        self.splitter.setOrientation(Qt.Horizontal)
         layout = QVBoxLayout(self)
         layout.setMargin(0)
         layout.addWidget(self.splitter)
@@ -31,9 +31,8 @@ if __name__ == "__main__":
     if entryfle:
         app = QApplication(sys.argv)
         window = Window()
-        # window.view.setHtml(open(entryfle, encoding="utf8").read())
         window.view.load(QUrl(entryfle))
         window.show()
-        app.exec_()
+        sys.exit(app.exec_())
     else:
-        print("진입 페이지를 지정해 주세요")
+        sys.exit("진입 페이지를 지정해 주세요")

@@ -45,7 +45,6 @@ class WebViewPlus(QWebView):
 
     # webview의 document에 이벤트를 발생함.
     def fireEvent(self, type, detail):
-        print(type, detail)
         self.page().mainFrame().evaluateJavaScript(WebViewPlus.customEvent.format(type=type, detail=detail))
 
 
