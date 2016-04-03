@@ -2,7 +2,7 @@
 
 import logging
 from PyQt4.QtWebKit import QWebView, QWebPage, QWebInspector, QWebSettings
-from PyQt4.QtGui import QShortcut
+from PyQt4.QtGui import QShortcut, QDialog, QGridLayout, QWidget
 from PyQt4.QtCore import Qt
 
 
@@ -34,15 +34,26 @@ class WebViewPlus(QWebView):
         self.webInspector.setPage(self.page())
 
         shortcut = QShortcut(self)
+        shortcut.setContext(Qt.ApplicationShortcut)
         shortcut.setKey(Qt.Key_F12)
         shortcut.activated.connect(self._toggleInspector)
         self.webInspector.setVisible(True)
+        
+        self.devTool = QDialog(self)
+        self.devTool.setWindowTitle("Development Tool")
+        self.devTool.resize(950, 400)
+        layout = QGridLayout()
+        layout.addWidget(self.webInspector)
+        layout.setMargin(0)
+        self.devTool.setLayout(layout)
+
 
     def _toggleInspector(self):
         """
 		F12키를 다시 누르면 "개발자 도구"가 사라짐
 		"""
-        self.webInspector.setVisible(not self.webInspector.isVisible())
+        self.devTool.setVisible(not self.devTool.isVisible())
+        self.devTool.resize(950,400)
 
     # webview의 document에 이벤트를 발생함.
     def fireEvent(self, type, detail):

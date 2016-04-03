@@ -4,32 +4,35 @@
 import sys
 import os.path
 from PyQt4.QtCore import QUrl, Qt
-from PyQt4.QtGui import QWidget, QSplitter, QVBoxLayout, QApplication
+from PyQt4.QtGui import QApplication, QMainWindow, QStatusBar, QMessageBox
 from plus.kiwoom import KiwoomWebViewPlus
 
-class Window(QWidget):
+
+class Window(QMainWindow):
     """
     main window layout
     """
-    def __init__(self, entryfile):
+    def __init__(self):
         super().__init__()
         self.view = KiwoomWebViewPlus()
-        self.view.load(QUrl(entryfile))
-        self._initUI()
-        
-    def _initUI(self):
-        layout = QVBoxLayout()
-        layout.setMargin(0)
-        splitter = QSplitter(Qt.Vertical)
-        splitter.addWidget(self.view)
-        splitter.addWidget(self.view.webInspector)
-        layout.addWidget(splitter)
+        self.initUI()
 
-        self.setLayout(layout)
+    def initUI(self):
+        self.setCentralWidget(self.view)
         self.setMinimumSize(1024, 600)
         self.setWindowTitle("QWebview-plus for Kiwoom")
 
-        # window.view.setHtml(open(entryfle, encoding="utf8").read())
+        self.statusbar = QStatusBar()
+        self.setStatusBar(self.statusbar)
+        self.statusbar.showMessage("status bar showing message")
+
+    def closeEvent(self, event):
+        reply = QMessageBox.question(self, 'Message', "Are you sure to quit?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
 
 def main():
     try:
@@ -39,7 +42,8 @@ def main():
 
     if os.path.isfile(entryfile):
         app = QApplication(sys.argv)
-        window = Window(entryfile)
+        window = Window()
+        window.view.load(QUrl(entryfile))
         window.show()
         sys.exit(app.exec_())
     else:
