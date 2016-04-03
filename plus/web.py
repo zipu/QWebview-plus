@@ -2,7 +2,7 @@
 
 import logging
 from PyQt4.QtWebKit import QWebView, QWebPage, QWebInspector, QWebSettings
-from PyQt4.QtGui import QShortcut, QDialog, QGridLayout, QWidget
+from PyQt4.QtGui import QShortcut, QDialog, QGridLayout
 from PyQt4.QtCore import Qt
 
 
@@ -32,12 +32,13 @@ class WebViewPlus(QWebView):
         self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
         self.webInspector = QWebInspector(self)
         self.webInspector.setPage(self.page())
+        self.webInspector.setVisible(True)
 
         shortcut = QShortcut(self)
         shortcut.setContext(Qt.ApplicationShortcut)
         shortcut.setKey(Qt.Key_F12)
         shortcut.activated.connect(self._toggleInspector)
-        self.webInspector.setVisible(True)
+        
         
         self.devTool = QDialog(self)
         self.devTool.setWindowTitle("Development Tool")
@@ -57,7 +58,8 @@ class WebViewPlus(QWebView):
 
     # webview의 document에 이벤트를 발생함.
     def fireEvent(self, type, detail):
-        print(type, detail)
+        if hasattr(self, 'debug'):
+                self.debug.append('Event >> %s : %s' % (type, detail))
         self.page().mainFrame().evaluateJavaScript(WebViewPlus.customEvent.format(type=type, detail=detail))
 
 

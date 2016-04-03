@@ -49,6 +49,10 @@ class Kiwoom(QObject):
     # nErrCode가 0이면 로그인 성공, 음수면 실패
     def _OnEventConnect(self, errCode):
         self.view.fireEvent("eventConnect.kiwoom", errCode)
+        if (errCode == 0):
+            self.view.statusbar.showMessage('로그인 완료')
+        else:
+            self.view.statusbar.showMessage('로그인 실패 %s'% util.parseErrorCode(errCode))
 
     # 수신 메시지 이벤트
     def _OnReceiveMsg(self, scrNo, rQName, trCode, msg):

@@ -27,4 +27,4 @@ def parseErrorCode(code):
         "-305" : "주문수량이 총발행주수의 1%를 초과합니다.",
         "-306" : "주문수량은 총발행주수의 3%를 초과할 수 없습니다."
     }
-    return ht[code] + " (%s)" % code if code in ht else code
+    return ht[code] + " (ErrCode:%s)" % code if code in ht else "ErrCode: %s" % code
