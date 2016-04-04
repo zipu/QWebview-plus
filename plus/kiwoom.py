@@ -203,6 +203,14 @@ class Kiwoom(QObject):
 	def commGetData(self, jongmokCode, realType, fieldName, index, innerFieldName):
 		return self.ocx.dynamicCall("CommGetData(QString, QString, QString, int, QString)", jongmokCode, realType, fieldName, index, innerFieldName).strip()
 
+	# strRealType – 실시간 구분
+    # nFid – 실시간 아이템
+    # Ex) 현재가출력 - openApi.GetCommRealData(“주식시세”, 10);
+	# 참고)실시간 현재가는 주식시세, 주식체결 등 다른 실시간타입(RealType)으로도 수신가능
+	@pyqtSlot(str, int, result=str)
+	def getCommRealData(self, realType, fid):
+		return self.ocx.dynamicCall("GetCommRealData(QString, int)", realType, fid).strip()
+
 	# 주식 주문을 서버로 전송한다.
 	# sRQName - 사용자 구분 요청 명
 	# sScreenNo - 화면번호[4]
@@ -279,9 +287,9 @@ class Kiwoom(QObject):
 	# 타입 “0”은 항상 마지막에 등록한 종목들만 실시간등록이 됩니다.
 	# 타입 “1”은 이전에 실시간 등록한 종목들과 함께 실시간을 받고 싶은 종목을 추가로 등록할 때 사용합니다.
 	# ※ 종목, FID는 각각 한번에 실시간 등록 할 수 있는 개수는 100개 입니다.
-	@pyqtSlot(str, str, str, str)
+	@pyqtSlot(str, str, str, str, result=int)
 	def setRealReg(self, screenNo, codeList, fidList, optType):
-		self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)", screenNo, codeList, fidList, realType)
+		return self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)", screenNo, codeList, fidList, realType)
 
 	# 종목별 실시간 해제
 	# strScrNo : 화면번호

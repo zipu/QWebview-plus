@@ -70,7 +70,7 @@ document.addEventListener("receiveRealData.kiwoom", function(e) {
         "realType" : data.realType,
         "realData": data.realData
     });
-    console.log(kiwoom.plusGetRealData(data.jongmokCode, data.realType, 10));
+    console.log(kiwoom.commGetData(data.jongmokCode, data.realType, 10,  0, ""));
 });
 
 $("#search").click(function(e) {
