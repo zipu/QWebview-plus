@@ -181,39 +181,27 @@ class Kiwoom(QObject):
 	# 1. Tran 데이터
 	# 2. 실시간 데이터
 	# 3. 체결 데이터
-	@pyqtSlot(str, str, str, int, str, result=str)
-	def commGetData(self, jongmokCode, realType, fieldName, index, innerFieldName):
-		return self.ocx.dynamicCall("CommGetData(QString, QString, QString, int, QString)", jongmokCode, realType, fieldName, index, innerFieldName).strip()
-
 	# 1. Tran 데이터
 	# sJongmokCode : Tran명
 	# sRealType : 사용안함
 	# sFieldName : 레코드명
 	# nIndex : 반복인덱스
 	# sInnerFieldName: 아이템명
-	@pyqtSlot(str, str, int, str, result=str)
-	def plusGetTrData(self, jongmokCode, fieldName, index, innerFieldName):
-		return self.commGetData(jongmokCode, "", fieldName, index, innerFieldName)
-
 	# 2. 실시간 데이터
 	# sJongmokCode : Key Code
 	# sRealType : Real Type
 	# sFieldName : Item Index (FID)
 	# nIndex : 사용안함
 	# sInnerFieldName:사용안함
-	@pyqtSlot(str, str, str, result=str)
-	def plusGetRealData(self, jongmokCode, realType, fieldName):
-		return self.commGetData(jongmokCode, realType, fieldName, 0, "")
-
 	# 3. 체결 데이터
 	# sJongmokCode : 체결구분
 	# sRealType : “-1”
 	# sFieldName : 사용안함
 	# nIndex : ItemIndex
 	# sInnerFieldName:사용안함
-	@pyqtSlot(str, int, result=str)
-	def plusGetTradeData(self, jongmokCode, index):
-		return self.commGetData(jongmokCode, "-1", "", index, "")
+	@pyqtSlot(str, str, str, int, str, result=str)
+	def commGetData(self, jongmokCode, realType, fieldName, index, innerFieldName):
+		return self.ocx.dynamicCall("CommGetData(QString, QString, QString, int, QString)", jongmokCode, realType, fieldName, index, innerFieldName).strip()
 
 	# 주식 주문을 서버로 전송한다.
 	# sRQName - 사용자 구분 요청 명
