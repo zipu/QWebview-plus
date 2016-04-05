@@ -287,9 +287,9 @@ class Kiwoom(QObject):
 	# 타입 “0”은 항상 마지막에 등록한 종목들만 실시간등록이 됩니다.
 	# 타입 “1”은 이전에 실시간 등록한 종목들과 함께 실시간을 받고 싶은 종목을 추가로 등록할 때 사용합니다.
 	# ※ 종목, FID는 각각 한번에 실시간 등록 할 수 있는 개수는 100개 입니다.
-	@pyqtSlot(str, str, str, str, result=int)
+	@pyqtSlot(str, str, str, int, result=int)
 	def setRealReg(self, screenNo, codeList, fidList, optType):
-		return self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)", screenNo, codeList, fidList, realType)
+		return self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)", screenNo, codeList, fidList, optType)
 
 	# 종목별 실시간 해제
 	# strScrNo : 화면번호
