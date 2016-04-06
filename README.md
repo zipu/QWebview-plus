@@ -1,5 +1,6 @@
 # QWebview-plus
- - 키움 오픈 API+ for JavaScript를 지원하는 WebView
+ - 키움 오픈 API+ for JavaScript를 지원하는 Webkit2 기반의 WebView
+ - ES5 지원
 
 ## Development Environment
  - Windows 32bit
