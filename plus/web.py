@@ -1,8 +1,9 @@
 # -*-coding: utf-8 -*-
 import logging
-from PyQt4.QtWebKit import QWebView, QWebPage, QWebInspector, QWebSettings
-from PyQt4.QtGui import QShortcut
-from PyQt4.QtCore import Qt
+from PyQt5.QtWebKitWidgets import QWebView, QWebPage, QWebInspector
+from PyQt5.QtWebKit import QWebSettings
+from PyQt5.QtWidgets import QShortcut
+from PyQt5.QtCore import Qt
 
 
 class WebViewPlus(QWebView):

@@ -4,8 +4,8 @@
 ## Development Environment
  - Windows 32bit
  - 키움증권 Open API+ (https://www1.kiwoom.com/nkw.templateFrameSet.do?m=m1408000000)
- - Anaconda 32bit 2.4.0 (http://continuum.io/downloads)
-
+ - Python 3.4.4 (https://www.python.org/downloads/release/python-344/)
+ - pyQt5 (http://pyqt.sourceforge.net/Docs/PyQt5/installation.html#downloading-pyqt5)
 
 ## 키움 Open API+를 제공하는 kiwoom 객체 제공
 
@@ -44,5 +44,5 @@ QWebview-Plus에서 제공하는 kiwoom 객체와 이벤트를 손쉽게 사용�
 > 별도의 프로젝트로 관리 https://github.com/sculove/Kiwoom-Helper
 
 ## License
-Licensed under MIT:  
+Licensed under MIT:
 https://opensource.org/licenses/MIT

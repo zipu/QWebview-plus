@@ -1,7 +1,8 @@
 #-*-coding: utf-8 -*-
-from PyQt4.QtCore import SIGNAL, QObject, pyqtSlot
-from PyQt4.QAxContainer import QAxWidget
-from PyQt4.QtGui import QApplication
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
+from PyQt5.QAxContainer import QAxWidget
+from PyQt5.QtWidgets import QApplication
+
 from plus.web import WebViewPlus
 from plus import util
 import json
@@ -20,18 +21,24 @@ class KiwoomWebViewPlus(WebViewPlus):
 
 
 class Kiwoom(QObject):
+	OnEventConnect = pyqtSignal([int], ['QString'])
+
 	def __init__(self, view):
 		super().__init__()
 		self.view = view
 		self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
-		self.ocx.connect(self.ocx, SIGNAL("OnEventConnect(int)"), self._OnEventConnect)
-		self.ocx.connect(self.ocx, SIGNAL("OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"), self._OnReceiveTrData)
-		self.ocx.connect(self.ocx, SIGNAL("OnReceiveMsg(QString, QString, QString, QString)"), self._OnReceiveMsg)
-		self.ocx.connect(self.ocx, SIGNAL("OnReceiveRealData(QString, QString, QString)"), self._OnReceiveRealData)
-		self.ocx.connect(self.ocx, SIGNAL("OnReceiveChejanData(QString, int, QString)"), self._OnReceiveChejanData)
-		self.ocx.connect(self.ocx, SIGNAL("OnReceiveConditionVer(bool, QString)"), self._OnReceiveConditionVer)
-		self.ocx.connect(self.ocx, SIGNAL("OnReceiveTrCondition(QString, QString, QString, int, int)"), self._OnReceiveTrCondition)
-		self.ocx.connect(self.ocx, SIGNAL("OnReceiveRealCondition(QString, QString, QString, QString)"), self._OnReceiveRealCondition)
+		self.ocx.signal("OnEventConnect", 1, [int])
+		# self.ocx.connect(self.ocx, pyqtSignal("OnEventConnect(int)"), self._OnEventConnect)
+		self.ocx.connect(self.ocx, self.OnEventConnect, self._OnEventConnect)
+		# self.ocx.connect(self.ocx, pyqtSignal("OnReceiveTrData(QString, QString, QString, QString, QString, int, QString, QString, QString)"), self._OnReceiveTrData)
+
+		self.ocx.OnReceiveTrData[str, str, str, str, str, int, str, str, str].connect(self._OnReceiveTrData)
+		# self.ocx.connect(self.ocx, pyqtSignal("OnReceiveMsg(QString, QString, QString, QString)"), self._OnReceiveMsg)
+		# self.ocx.connect(self.ocx, pyqtSignal("OnReceiveRealData(QString, QString, QString)"), self._OnReceiveRealData)
+		# self.ocx.connect(self.ocx, pyqtSignal("OnReceiveChejanData(QString, int, QString)"), self._OnReceiveChejanData)
+		# self.ocx.connect(self.ocx, pyqtSignal("OnReceiveConditionVer(bool, QString)"), self._OnReceiveConditionVer)
+		# self.ocx.connect(self.ocx, pyqtSignal("OnReceiveTrCondition(QString, QString, QString, int, int)"), self._OnReceiveTrCondition)
+		# self.ocx.connect(self.ocx, pyqtSignal("OnReceiveRealCondition(QString, QString, QString, QString)"), self._OnReceiveRealCondition)
 
 	@pyqtSlot()
 	def quit(self):

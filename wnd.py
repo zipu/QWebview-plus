@@ -2,8 +2,8 @@
 #-*-coding: utf-8 -*-
 import sys
 import os.path
-from PyQt4.QtCore import *
-from PyQt4.QtGui import QWidget, QSplitter, QVBoxLayout, QApplication
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QWidget, QSplitter, QVBoxLayout, QApplication
 from plus.kiwoom import KiwoomWebViewPlus
 
 class Window(QWidget):
@@ -16,7 +16,7 @@ class Window(QWidget):
         self.splitter = QSplitter(self)
         self.splitter.setOrientation(Qt.Horizontal)
         layout = QVBoxLayout(self)
-        layout.setMargin(0)
+        # layout.setMargin(0)
         layout.addWidget(self.splitter)
         self.splitter.addWidget(self.view)
         self.splitter.addWidget(self.view.webInspector)
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     if entryfle:
         app = QApplication(sys.argv)
         window = Window()
-        window.view.load(QUrl(entryfle))
+        window.view.load(QUrl.fromLocalFile(os.path.join(os.path.dirname( os.path.abspath( __file__ ) ), entryfle)))
         window.show()
         sys.exit(app.exec_())
     else:
