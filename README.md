@@ -5,7 +5,7 @@
  - Windows 32bit
  - 키움증권 Open API+ (https://www1.kiwoom.com/nkw.templateFrameSet.do?m=m1408000000)
  - Python 3.4.4 (https://www.python.org/downloads/release/python-344/)
- - pyQt5 (http://pyqt.sourceforge.net/Docs/PyQt5/installation.html#downloading-pyqt5)
+ - pyQt5 (http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.5.1/PyQt5-5.5.1-gpl-Py3.4-Qt5.5.1-x32.exe)
 
 ## 키움 Open API+를 제공하는 kiwoom 객체 제공
 
