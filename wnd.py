@@ -9,20 +9,19 @@ from plus.kiwoom import KiwoomWebViewPlus
 class Window(QWidget):
     def __init__(self):
         super().__init__()
-        self.setMinimumSize(1024, 600)
+        self.setMinimumSize(1280, 768)
         self.setWindowTitle("QWebview-plus for Kiwoom")
-
         self.view = KiwoomWebViewPlus()
         self.splitter = QSplitter(self)
         self.splitter.setOrientation(Qt.Horizontal)
         layout = QVBoxLayout(self)
-        # layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         layout.addWidget(self.splitter)
         self.splitter.addWidget(self.view)
         self.splitter.addWidget(self.view.webInspector)
+        self.splitter.setSizes([640,640])
 
 if __name__ == "__main__":
-
     if len(sys.argv) < 2:
         entryfle = "index.html" if os.path.isfile("index.html") else ""
     else:
