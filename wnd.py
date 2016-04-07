@@ -3,23 +3,36 @@
 import sys
 import os.path
 from PyQt5.QtCore import *
-from PyQt5.QtWidgets import QWidget, QSplitter, QVBoxLayout, QApplication
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QSplitter, QMessageBox
 from plus.kiwoom import KiwoomWebViewPlus
 
-class Window(QWidget):
+class Window(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setMinimumSize(1280, 768)
+        self.setMinimumSize(1024, 640)
         self.setWindowTitle("QWebview-plus for Kiwoom")
         self.view = KiwoomWebViewPlus()
-        self.splitter = QSplitter(self)
-        self.splitter.setOrientation(Qt.Horizontal)
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0,0,0,0)
-        layout.addWidget(self.splitter)
-        self.splitter.addWidget(self.view)
-        self.splitter.addWidget(self.view.webInspector)
-        self.splitter.setSizes([640,640])
+        self.setCentralWidget(self.view)
+
+        self.view.devTool.setVisible(True)
+
+        # view split
+        # self.splitter = QSplitter(self)
+        # self.splitter.setOrientation(Qt.Horizontal)
+        # layout = QVBoxLayout(self)
+        # layout.setContentsMargins(0,0,0,0)
+        # layout.addWidget(self.splitter)
+        # self.splitter.addWidget(self.view)
+        # self.splitter.addWidget(self.view.webInspector)
+        # self.view.webInspector.setVisible(True)
+        # self.splitter.setSizes([640,640])
+
+    def closeEvent(self, event):
+        reply = QMessageBox.question(self, 'Message', "Are you sure to quit?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
