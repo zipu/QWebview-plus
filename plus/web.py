@@ -25,6 +25,20 @@ class WebViewPlus(QWebView):
         self.setPage(WebPagePlus())
         self._setupInspector()
 
+        #Keyboard shortcuts
+        shortcut = {}
+
+        shortcut['F12'] = QShortcut(self)
+        shortcut['F12'].setContext(Qt.ApplicationShortcut)
+        shortcut['F12'].setKey(Qt.Key_F12)
+        shortcut['F12'].activated.connect(self._toggleInspector)
+
+        #F5 - Page reloading
+        shortcut['F5'] = QShortcut(self)
+        shortcut['F5'].setKey(Qt.Key_F5)
+        shortcut['F5'].activated.connect(self.reload)
+
+
     def _setupInspector(self):
         """
 		F12키를 누르면 "개발자 도구"가 노출됨
@@ -34,12 +48,6 @@ class WebViewPlus(QWebView):
         self.webInspector.setPage(self.page())
         self.webInspector.setVisible(True)
 
-        shortcut = QShortcut(self)
-        shortcut.setContext(Qt.ApplicationShortcut)
-        shortcut.setKey(Qt.Key_F12)
-        shortcut.activated.connect(self._toggleInspector)
-        
-        
         self.devTool = QDialog(self)
         self.devTool.setWindowTitle("Development Tool")
         self.devTool.resize(950, 400)
@@ -54,7 +62,7 @@ class WebViewPlus(QWebView):
 		F12키를 다시 누르면 "개발자 도구"가 사라짐
 		"""
         self.devTool.setVisible(not self.devTool.isVisible())
-        self.devTool.resize(950,400)
+        self.devTool.resize(950, 400)
 
     # webview의 document에 이벤트를 발생함.
     def fireEvent(self, type, detail):

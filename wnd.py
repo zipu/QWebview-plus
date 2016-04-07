@@ -16,7 +16,7 @@ class Window(QMainWindow):
         super().__init__()
         self.view = KiwoomWebViewPlus()
         self.initUI()
-        
+
     def initUI(self):
         self.setCentralWidget(self.view)
         self.setMinimumSize(1024, 600)
@@ -35,22 +35,6 @@ class Window(QMainWindow):
         else:
             event.ignore()
 
-    def debuggingMode(self):
-        self.debuggingConsole = QTextEdit(self)
-        self.debuggingConsole.setReadOnly(True)
-        self.debuggingConsole.setLineWrapMode(QTextEdit.NoWrap)
-        self.view.debug = self.debuggingConsole
-
-        layout = QVBoxLayout()
-        layout.setMargin(0)
-        self.splitter = QSplitter(Qt.Vertical)
-        self.splitter.addWidget(self.view)
-        self.splitter.addWidget(self.debuggingConsole)
-        layout.addWidget(self.splitter)
-
-        self.setCentralWidget(self.splitter)
-
-
 def main():
     try:
         entryfile = sys.argv[1]
@@ -60,7 +44,6 @@ def main():
     if os.path.isfile(entryfile):
         app = QApplication(sys.argv)
         window = Window()
-        window.debuggingMode()
         window.view.load(QUrl(entryfile))
         window.show()
         sys.exit(app.exec_())
