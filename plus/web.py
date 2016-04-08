@@ -15,10 +15,8 @@ class WebViewPlus(QWebView):
 	"""
 
     customEvent = """
-	var event = document.createEvent("CustomEvent");
-	event.initCustomEvent("{type}", true, true, {detail} );
-	document.dispatchEvent(event);
-	"""
+    angular.element(document.querySelector("#trading-view")).scope().$broadcast("{type}",{detail});
+    """
 
     def __init__(self):
         super().__init__()
@@ -63,11 +61,10 @@ class WebViewPlus(QWebView):
 		"""
         self.devTool.setVisible(not self.devTool.isVisible())
         self.devTool.resize(950, 400)
+       
 
     # webview의 document에 이벤트를 발생함.
     def fireEvent(self, type, detail):
-        if hasattr(self, 'debug'):
-                self.debug.append('Event >> %s : %s' % (type, detail))
         self.page().mainFrame().evaluateJavaScript(WebViewPlus.customEvent.format(type=type, detail=detail))
 
 
