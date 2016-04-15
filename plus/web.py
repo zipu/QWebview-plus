@@ -15,12 +15,11 @@ class WebViewPlus(QWebView):
 	"""
 
     customEvent = """
-    var scope = angular.element(document.querySelector("#trading-view")).scope()
-    scope.$apply(function(){{
-        scope.$broadcast("{type}",{detail});
+    var trvscope = angular.element(document.querySelector(".trading-view")).scope()
+    trvscope.$apply(function(){{
+        trvscope.$broadcast("{type}",{detail});
     }});
     """
-
 
     def __init__(self):
         super().__init__()

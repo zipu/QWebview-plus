@@ -1,10 +1,10 @@
-var app = angular.module('kiwoomApp', ['ngRoute'])
+angular.module('kiwoomApp', ['ngRoute'])
 	.config(function ($routeProvider) {
-		'use strict';
         
 		var routeConfig = {
-			controller: 'TradingCtrl',
-			templateUrl: 'views/tradingView.html'
+			templateUrl: 'views/tradingView.html',
+            controller: 'TradingCtrl',
+            controllerAs: 'trview'
 		};
 
 		$routeProvider

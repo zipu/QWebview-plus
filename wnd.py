@@ -3,7 +3,7 @@
 
 import sys
 import os.path
-from PyQt4.QtCore import QUrl, Qt
+from PyQt4.QtCore import QUrl
 from PyQt4.QtGui import QApplication, QMainWindow, QStatusBar, QMessageBox, QVBoxLayout, QSplitter, QTextEdit
 from plus.kiwoom import KiwoomWebViewPlus
 
