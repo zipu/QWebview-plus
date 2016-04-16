@@ -3,8 +3,8 @@
 
 import sys
 import os.path
-from PyQt4.QtCore import QUrl
-from PyQt4.QtGui import QApplication, QMainWindow, QStatusBar, QMessageBox, QVBoxLayout, QSplitter, QTextEdit
+from PyQt5.QtCore import QUrl
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStatusBar, QMessageBox, QVBoxLayout, QSplitter, QTextEdit
 from plus.kiwoom import KiwoomWebViewPlus
 
 
@@ -44,7 +44,7 @@ def main():
     if os.path.isfile(entryfile):
         app = QApplication(sys.argv)
         window = Window()
-        window.view.load(QUrl(entryfile))
+        window.view.load(QUrl.fromLocalFile(os.path.join(os.path.dirname( os.path.abspath( __file__ ) ), entryfile)))
         window.show()
         sys.exit(app.exec_())
     else:

@@ -1,9 +1,10 @@
 # -*-coding: utf-8 -*-
 
 import logging
-from PyQt4.QtWebKit import QWebView, QWebPage, QWebInspector, QWebSettings
-from PyQt4.QtGui import QShortcut, QDialog, QGridLayout
-from PyQt4.QtCore import Qt
+from PyQt5.QtWebKitWidgets import QWebView, QWebPage, QWebInspector
+from PyQt5.QtWebKit import QWebSettings
+from PyQt5.QtWidgets import QShortcut, QDialog, QGridLayout
+from PyQt5.QtCore import Qt
 
 
 class WebViewPlus(QWebView):
@@ -54,7 +55,7 @@ class WebViewPlus(QWebView):
         self.devTool.resize(950, 400)
         layout = QGridLayout()
         layout.addWidget(self.webInspector)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         self.devTool.setLayout(layout)
 
 
