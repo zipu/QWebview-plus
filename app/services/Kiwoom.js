@@ -33,7 +33,7 @@ angular.module('kiwoomApp')
       
       var response = function(e, data){
           console.info('< '+e.name+' > received from the server...');
-          console.log(data);
+          console.info('Data info :', data);
           
           switch (e.name){
              case 'eventConnect.kiwoom':
@@ -52,7 +52,7 @@ angular.module('kiwoomApp')
                 
              case 'receiveTrData.kiwoom':
                 var len = kiwoom.getRepeatCnt(data.trCode, data.rQName);
-                console.info(data.rQName, data.trCode, len);
+                console.info('rQName : '+data.rQName+', trCode: '+data.trCode+', repeadCnt : '+len);
               
                 switch(data.trCode) {
                   case 'opt10001' :
@@ -73,7 +73,7 @@ angular.module('kiwoomApp')
                       console.log('TR 데이터', JSON.parse(kiwoom.getCommDataEx(data.trCode, data.rQName)));
                       break;
                 }
-                
+                break;
                 
               case 'receiveRealData':
                  console.info('실시간데이터', {
@@ -82,6 +82,7 @@ angular.module('kiwoomApp')
                      'realData': data.realData
                  });
                  console.log(kiwoom.plusGetRealData(data.jongmokCode, data.realType, 10));
+                 break;
           }
       };
       

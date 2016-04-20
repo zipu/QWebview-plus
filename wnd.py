@@ -4,7 +4,7 @@
 import sys
 import os.path
 from PyQt5.QtCore import QUrl
-from PyQt5.QtWidgets import QApplication, QMainWindow, QStatusBar, QMessageBox, QVBoxLayout, QSplitter, QTextEdit
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStatusBar, QMessageBox, QVBoxLayout, QSplitter
 from plus.kiwoom import KiwoomWebViewPlus
 
 

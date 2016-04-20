@@ -1,5 +1,5 @@
 #-*-coding: utf-8 -*-
-from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSlot, QVariant
 from PyQt5.QAxContainer import QAxWidget
 from PyQt5.QtWidgets import QApplication
 from plus.web import WebViewPlus
@@ -21,20 +21,20 @@ class KiwoomWebViewPlus(WebViewPlus):
 
 
 class Kiwoom(QObject):
-    OnEventConnect = pyqtSignal([int], ['QString'])
-    
+    #OnEventConnect = pyqtSignal([int], ['QString'])
+
     def __init__(self, view):
         super().__init__()
         self.view = view
         self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
         self.ocx.OnEventConnect[int].connect(self._OnEventConnect)
-        self.ocx.OnReceiveMsg[str,str,str,str].connect(self._OnReceiveMsg)
+        self.ocx.OnReceiveMsg[str, str, str, str].connect(self._OnReceiveMsg)
         self.ocx.OnReceiveTrData[str, str, str, str, str, int, str, str, str].connect(self._OnReceiveTrData)
-        self.ocx.OnReceiveRealData[str,str,str].connect(self._OnReceiveRealData)
-        self.ocx.OnReceiveChejanData[str,int,str].connect(self._OnReceiveChejanData)
-        self.ocx.OnReceiveConditionVer[int,str].connect(self._OnReceiveConditionVer)
-        self.ocx.OnReceiveTrCondition[str,str,str,int,int].connect(self._OnReceiveTrCondition)
-        self.ocx.OnReceiveRealCondition[str,str,str,str].connect(self._OnReceiveRealCondition)
+        self.ocx.OnReceiveRealData[str, str, str].connect(self._OnReceiveRealData)
+        self.ocx.OnReceiveChejanData[str, int, str].connect(self._OnReceiveChejanData)
+        self.ocx.OnReceiveConditionVer[int, str].connect(self._OnReceiveConditionVer)
+        self.ocx.OnReceiveTrCondition[str, str, str, int, int].connect(self._OnReceiveTrCondition)
+        self.ocx.OnReceiveRealCondition[str, str, str, str].connect(self._OnReceiveRealCondition)
         
 
     @pyqtSlot()
@@ -69,6 +69,7 @@ class Kiwoom(QObject):
         # sErrorCode – 1.0.0.1 버전 이후 사용하지 않음.
         # sMessage – 1.0.0.1 버전 이후 사용하지 않음.
         # sSplmMsg - 1.0.0.1 버전 이후 사용하지 않음.
+        
         self.view.fireEvent("receiveTrData.kiwoom", {
             "scrNo" : scrNo,
             "rQName" : rQName,
@@ -334,3 +335,14 @@ class Kiwoom(QObject):
     def disconnectRealData(self, scnNo):
         self.ocx.dynamicCall("DisconnectRealData(QString)", scnNo)
 
+    # 시장구분에 따른 종목 코드를 반환한다.
+    # 입력값 (0: 장내, 3: ELW, 4: 뮤추얼펀드, 5: 신주인수권, 6: 리츠, 8: ETF, 9: 하이일드펀드, 10: 코스닥, 30: 제3시장)
+    @pyqtSlot(result=QVariant)
+    def getCodeNameList(self):
+        ret = self.ocx.dynamicCall("GetCodeListByMarket(QString)", ["0"])
+        kospi_code_list = ret.split(';')
+        kospi_code_name_list = []
+        for x in kospi_code_list:
+            name = self.ocx.dynamicCall("GetMasterCodeName(Qstring)", [x])
+            kospi_code_name_list.append(x + " : " + name)
+        return kospi_code_name_list
