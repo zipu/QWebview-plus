@@ -34,11 +34,16 @@ class WebViewPlus(QWebView):
         self.webInspector = QWebInspector(self)
         self.webInspector.setPage(self.page())
 
-        # shortcut
-        shortcut = QShortcut(self)
-        shortcut.setContext(Qt.ApplicationShortcut)
-        shortcut.setKey(Qt.Key_F12)
-        shortcut.activated.connect(self._toggleInspector)
+        #Keyboard shortcuts
+        shortcut = {}
+        shortcut['F12'] = QShortcut(self)
+        shortcut['F12'].setContext(Qt.ApplicationShortcut)
+        shortcut['F12'].setKey(Qt.Key_F12)
+        shortcut['F12'].activated.connect(self._toggleInspector)
+        #F5 - Page reloading
+        shortcut['F5'] = QShortcut(self)
+        shortcut['F5'].setKey(Qt.Key_F5)
+        shortcut['F5'].activated.connect(self.reload)
 
         # Devtools
         self.webInspector.setVisible(True)
