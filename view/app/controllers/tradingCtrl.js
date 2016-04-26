@@ -7,6 +7,7 @@ TradingCtrl.$inject = ['$scope', '$interval', '$timeout','KiwoomService'];
 function TradingCtrl($scope, $interval,$timeout, KiwoomService) {
 
     var trview = this;
+    trview.code = '003000';
 
     trview.login = function(){
         KiwoomService.login();

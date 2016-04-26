@@ -9,6 +9,6 @@ python wnd.py
 
 -디버깅 모드
 ```bash
-python degug.py
+python degug.py --remote-debugging-port=<port>
 ```
-> 실행 후 크롬 브라우저 (혹은 crominum 기반의 부라우저)에서 localhost:5000 으로 접속
+> 실행 후 'F12' 버튼 클릭 또는 크롬 브라우저 (혹은 crominum 기반 브라우저)에서 localhost:<port> 으로 접속

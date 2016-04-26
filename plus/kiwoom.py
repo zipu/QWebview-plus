@@ -57,7 +57,7 @@ class Kiwoom(QObject):
     def _OnEventConnect(self, errCode):
         #self.view.fireEvent("eventConnect.kiwoom", errCode)
         data = json.dumps(errCode, ensure_ascii=False)
-        self.loginEvent.emit("eventoConnect.kiwoom", data)
+        self.loginEvent.emit("eventConnect.kiwoom", data)
 
     # 수신 메시지 이벤트
     def _OnReceiveMsg(self, scrNo, rQName, trCode, msg):
@@ -67,7 +67,7 @@ class Kiwoom(QObject):
             "trCode": trCode,
             "msg" : msg
         }, ensure_ascii=False)
-        self.fireEvent.emit("receiveMsg.kiwoom", data)
+        self.fireEvent.emit("receiveMsg.kiwoom", str(data))
 
     # Tran 수신시 이벤트
     def _OnReceiveTrData(self, scrNo, rQName , trCode, recordName, prevNext, dataLength, errorCode, message, splmMsg):

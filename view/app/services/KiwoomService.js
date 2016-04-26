@@ -5,8 +5,9 @@ angular.module('tradeSystem')
           kiwoom = channel.objects.kiwoom;
           kiwoom.fireEvent.connect(function(event, data){
               console.info('< '+event+' > received from the server...');
-              console.info('Data info :'+JSON.parse(data));
-              respondTo(event,data);
+              console.info('Data info :');
+              console.log(JSON.parse(data));
+              eventHandler(event, JSON.parse(data));
           });
       });
       
@@ -59,9 +60,9 @@ angular.module('tradeSystem')
           });
       };
       
-      var respondTo = function(e, data){
+      eventHandler = function(event, data){
 
-          switch (e.name){
+          switch (event){
              
              case 'receiveMsg.kiwoom':
                 console.info({
@@ -73,7 +74,9 @@ angular.module('tradeSystem')
                 break;
                 
              case 'receiveTrData.kiwoom':
-                var len = kiwoom.getRepeatCnt(data.trCode, data.rQName);
+                kiwoom.getRepeatCnt(data.trCode, data.rQName, function(len){
+                    len = len;
+                });
                 console.info('rQName : '+data.rQName+', trCode: '+data.trCode+', repeadCnt : '+len);
               
                 switch(data.trCode) {

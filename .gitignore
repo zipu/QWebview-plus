@@ -3,4 +3,4 @@
 todo
 __pycache__/
 view/static/assets/fonts/
-view/bower_components
+view/bower_components/
