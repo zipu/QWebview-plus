@@ -4,7 +4,7 @@
 import sys
 import os.path
 from PyQt5.QtCore import QUrl
-from PyQt5.QtWidgets import QApplication, QMainWindow, QStatusBar, QMessageBox, QVBoxLayout, QSplitter
+from PyQt5.QtWidgets import QApplication, QMainWindow
 from plus.kiwoom import KiwoomWebViewPlus
 
 
@@ -19,12 +19,8 @@ class Window(QMainWindow):
 
     def initUI(self):
         self.setCentralWidget(self.view)
-        self.setMinimumSize(1024, 600)
+        self.setMinimumSize(1200, 800)
         self.setWindowTitle("QWebview-plus for Kiwoom")
-
-        self.view.statusbar = QStatusBar()
-        self.setStatusBar(self.view.statusbar)
-        self.view.statusbar.showMessage("Press 'F12' button to open development tool")
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Message', "Are you sure to quit?",

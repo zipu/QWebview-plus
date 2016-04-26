@@ -2,17 +2,47 @@
 <html lang="en" data-framework="angularjs">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"> 
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-route.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    
+    <!-- links to style sources -->
+    <link href="./view/bower_components/angular-material/angular-material.css" rel="stylesheet" />
+    <link rel="stylesheet" href="view/static/assets/style.css">
 </head>
 
-<body ng-app="kiwoomApp" ng-cloak>
-       <div class="trading-view" ng-view></div>
+<body ng-app="tradeSystem" ng-cloak layout="column">
+    <md-toolbar layout="row" >
+        <h1>Trading System</h1>
+    </md-toolbar>
+       
+    <div class="container" layout="row" flex>
+       <md-sidenav layout="column" md-is-locked-open="true" md-whiteframe="2dp" flex="15">
+         <md-list>
+            <md-list-item>
+                <md-button ng-href="#/" md-no-ink > Trading </md-button>
+            </md-list-item>
+            <md-list-item>
+                  <md-button ng-href="#/stats" md-no-ink> Stats </md-button>
+            </md-list-item>  
+         </md-list>
+       </md-sidenav>
+       
+       <md-content class="contents" flex layout="column" ng-view>
+       </md-content>
+       
+    </div>
 
-   
-<script src="app/app.js"></script>
-<script src="app/controllers/tradingCtrl.js"></script>
-<script src="app/services/Kiwoom.js"></script>
+<!-- external modules -->
+<script src="./view/bower_components/angular/angular.min.js"></script>
+<script src="./view/bower_components/angular-route//angular-route.js"></script>
+<script src="./view/bower_components/angular-animate/angular-animate.js" type="text/javascript" ></script>
+<script src="./view/bower_components/angular-aria/angular-aria.js" type="text/javascript" ></script>
+<script src="./view/bower_components/angular-material/angular-material.js" type="text/javascript" ></script>   
+
+<!-- local modules -->
+<script src="./view/app/qwebchannel.js"></script>
+<script src="./view/app/app.js"></script>
+<script src="./view/app/controllers/tradingCtrl.js"></script>
+<script src="./view/app/services/KiwoomService.js"></script>
+
 </body>
 </html>

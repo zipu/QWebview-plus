@@ -1,8 +1,31 @@
-angular.module('kiwoomApp')
-  .factory('Kiwoom', ['$filter',function ($filter) {
+angular.module('tradeSystem')
+  .factory('KiwoomService', ['$filter',function ($filter) {
+      
+      new QWebChannel(qt.webChannelTransport, function(channel){
+          kiwoom = channel.objects.kiwoom;
+          kiwoom.fireEvent.connect(function(event, data){
+              console.info('< '+event+' > received from the server...');
+              console.info('Data info :'+JSON.parse(data));
+              respondTo(event,data);
+          });
+      });
       
       var login = function(){
-         kiwoom.getConnectState()? kiwoom.commTerminate() : kiwoom.commConnect();        
+        kiwoom.getConnectState(function(state){
+             if (state ==1){
+                 kiwoom.commTerminate();
+             } else if (state == 0){
+                 kiwoom.commConnect(function(){
+                      kiwoom.loginEvent.connect(function(event,data){
+                          if (data == 0){
+                             console.log("로그인 성공");
+                             //alert(kiwoom.getLoginInfo('ACCNO').replace(/;$/,'').split(';'));
+                          } else if (data < 0) 
+                             console.log("로그인 실패");
+                      });
+                 });
+             }
+        });
       };
          
       var getLoginInfo = function(){
@@ -30,17 +53,16 @@ angular.module('kiwoomApp')
  
       };
       
+      var ConnectState = function(callback){
+          kiwoom.getConnectState(function(state){
+              callback(state);
+          });
+      };
       
-      var response = function(e, data){
-          console.info('< '+e.name+' > received from the server...');
-          console.info('Data info :', data);
-          
+      var respondTo = function(e, data){
+
           switch (e.name){
-             case 'eventConnect.kiwoom':
-                console.info(kiwoom.parseErrorCode(data));
-             //   console.log(kiwoom.getLoginInfo('ACCNO').replace(/;$/,'').split(';'));
-                break;
-              
+             
              case 'receiveMsg.kiwoom':
                 console.info({
                     'scrNo' : data.scrNo,
@@ -75,7 +97,7 @@ angular.module('kiwoomApp')
                 }
                 break;
                 
-              case 'receiveRealData':
+              case 'receiveRealData.kiwoom':
                  console.info('실시간데이터', {
                      'jongmokCode' : data.jongmokCode,
                      'realType' : data.realType,
@@ -86,24 +108,12 @@ angular.module('kiwoomApp')
           }
       };
       
-      var EVENTS = [
-          'eventConnect.kiwoom',
-          'receiveMsg.kiwoom',
-          'receiveTrData.kiwoom',
-          'receiveRealData.kiwoom',
-          'receiveChejanData.kiwoom',
-          'receiveConditionVer.kiwoom',
-          'receiveTrCondition.kiwoom',
-          'receiveRealCondition.kiwoom'
-      ];
-      
       return {
           login : login,
           getLoginInfo : getLoginInfo,
           chart : chart,
           search : search,
-          respondTo : response,
-          EVENTS : EVENTS
+          ConnectState : ConnectState
       };
   }]);
  

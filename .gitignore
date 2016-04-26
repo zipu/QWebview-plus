@@ -1,4 +1,6 @@
 .vscode/
 .eslintrc.json
-todo.txt
+todo
 __pycache__/
+view/static/assets/fonts/
+view/bower_components
