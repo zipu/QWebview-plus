@@ -14,7 +14,7 @@ class Window(QMainWindow):
         self.view = KiwoomWebViewPlus()
         self.setCentralWidget(self.view)
 
-        self.view.devTool.setVisible(True)
+        #self.view.devTool.setVisible(True)
 
         # view split
         # self.splitter = QSplitter(self)
