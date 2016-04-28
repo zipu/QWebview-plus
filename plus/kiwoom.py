@@ -18,20 +18,16 @@ class KiwoomWebViewPlus(WebViewPlus):
 		self.urlChanged.connect(self._OnUrlChanged)
 
 	def _OnUrlChanged(self, url):
-		#self.page().mainFrame().addToJavaScriptWindowObject("kiwoom", self._kiwoom)
 		self.webchannel = QWebChannel(self.page())
 		self.page().setWebChannel(self.webchannel)
 		self.webchannel.registerObject("kiwoom", self._kiwoom)
 
 
 class Kiwoom(QObject):
-	#OnEventConnect = pyqtSignal([int], ['QString'])
-	fireEvent = pyqtSignal(str, str)
-	loginEvent = pyqtSignal(str, str)
+	bridge = pyqtSignal(str, str)
 
 	def __init__(self, view):
 		super().__init__()
-		self.view = view
 		self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
 		self.ocx.OnEventConnect[int].connect(self._OnEventConnect)
 		self.ocx.OnReceiveMsg[str,str,str,str].connect(self._OnReceiveMsg)
@@ -43,22 +39,20 @@ class Kiwoom(QObject):
 		self.ocx.OnReceiveRealCondition[str,str,str,str].connect(self._OnReceiveRealCondition)
 
 	@pyqtSlot()
-	def quit(self):
+	def kw_quit(self):
 		self.commTerminate()
 		QApplication.quit()
 
 	# 에러코드의 메시지를 출력한다.
 	@pyqtSlot(int, result=str)
-	def parseErrorCode(self, errCode):
+	def kw_parseErrorCode(self, errCode):
 		return util.parseErrorCode(errCode)
-
 
 	# 통신 연결 상태 변경시 이벤트
 	# nErrCode가 0이면 로그인 성공, 음수면 실패
 	def _OnEventConnect(self, errCode):
-		#self.view.fireEvent("eventConnect.kiwoom", errCode)
 		data = json.dumps(errCode, ensure_ascii=False)
-		self.loginEvent.emit("eventConnect.kiwoom", data)
+		self.bridge.emit("eventConnect.kiwoom", data)
 
 	# 수신 메시지 이벤트
 	def _OnReceiveMsg(self, scrNo, rQName, trCode, msg):
@@ -68,7 +62,7 @@ class Kiwoom(QObject):
 			"trCode": trCode,
 			"msg" : msg
 		}, ensure_ascii=False)
-		self.fireEvent.emit("receiveMsg.kiwoom", str(data))
+		self.bridge.emit("receiveMsg.kiwoom", str(data))
 
 	# Tran 수신시 이벤트
 	def _OnReceiveTrData(self, scrNo, rQName , trCode, recordName, prevNext, dataLength, errorCode, message, splmMsg):
@@ -87,7 +81,7 @@ class Kiwoom(QObject):
 			# "message" : message,
 			# "splmMsg" : splmMsg
 		}, ensure_ascii=False)
-		self.fireEvent.emit("receiveTrData.kiwoom", data)
+		self.bridge.emit("receiveTrData.kiwoom", data)
 
 	# 실시간 시세 이벤트
 	def _OnReceiveRealData(self, jongmokCode, realType, realData):
@@ -96,7 +90,7 @@ class Kiwoom(QObject):
 			"realType" : realType,
 			"realData": realData
 		}, ensure_ascii=False)
-		self.fireEvent.emit("receiveRealData.kiwoom", data)
+		self.bridge.emit("receiveRealData.kiwoom", data)
 
 	# 체결데이터를 받은 시점을 알려준다.
 	# sGubun – 0:주문체결통보, 1:잔고통보, 3:특이신호
@@ -107,7 +101,7 @@ class Kiwoom(QObject):
 			"itemCnt" : itemCnt,
 			"fidList": fidList
 		}, ensure_ascii=False)
-		self.fireEvent.emit("receiveChejanData.kiwoom", data)
+		self.bridge.emit("receiveChejanData.kiwoom", data)
 
 	# 로컬에 사용자조건식 저장 성공여부 응답 이벤트
 	def _OnReceiveConditionVer(self, ret, msg):
@@ -115,7 +109,7 @@ class Kiwoom(QObject):
 			"ret" : ret,
 			"msg" : msg
 		}, ensure_ascii=False)
-		self.fireEvent.emit("receiveConditionVer.kiwoom", data)
+		self.bridge.emit("receiveConditionVer.kiwoom", data)
 
 	# 조건검색 조회응답으로 종목리스트를 구분자(“;”)로 붙어서 받는 시점.
 	# LPCTSTR sScrNo : 종목코드
@@ -131,7 +125,7 @@ class Kiwoom(QObject):
 			"index" : index,
 			"next" : next,
 		}, ensure_ascii=False)
-		self.fireEvent.emit("receiveTrCondition.kiwoom",data)
+		self.bridge.emit("receiveTrCondition.kiwoom",data)
 
 	# 편입, 이탈 종목이 실시간으로 들어옵니다.
 	# strCode : 종목코드
@@ -145,7 +139,7 @@ class Kiwoom(QObject):
 			"conditionName" : conditionName,
 			"conditionIndex" : conditionIndex
 		}, ensure_ascii=False)
-		self.fireEvent.emit("receiveRealCondition.kiwoom", data)
+		self.bridge.emit("receiveRealCondition.kiwoom", data)
 
 	# 편입, 이탈 종목이 실시간으로 들어옵니다.
 	# strCode : 종목코드
@@ -163,13 +157,13 @@ class Kiwoom(QObject):
 	# 로그인
 	# 0 - 성공, 음수값은 실패
 	@pyqtSlot(result=int)
-	def commConnect(self):
+	def kw_commConnect(self):
 		return self.ocx.dynamicCall("CommConnect()")
 
 	# 로그인 상태 확인
 	# 0:미연결, 1:연결완료, 그외는 에러
 	@pyqtSlot(result=int)
-	def getConnectState(self):
+	def kw_getConnectState(self):
 		return self.ocx.dynamicCall("GetConnectState()")
 
 	# 로그 아웃
@@ -185,7 +179,7 @@ class Kiwoom(QObject):
 	# “KEY_BSECGB” – 키보드보안 해지여부. 0:정상, 1:해지
 	# “FIREW_SECGB” – 방화벽 설정 여부. 0:미설정, 1:설정, 2:해지
 	@pyqtSlot(str,result=str)
-	def getLoginInfo(self, tag):
+	def kw_getLoginInfo(self, tag):
 		return self.ocx.dynamicCall("GetLoginInfo(QString)",[tag])
 
 	# Tran 입력 값을 서버통신 전에 입력값일 저장한다.
@@ -200,12 +194,12 @@ class Kiwoom(QObject):
 	# OP_ERR_RQ_STRING_FAIL – 요청전문 작성 실패
 	# OP_ERR_NONE – 정상처리
 	@pyqtSlot(str, str, int, str, result=int)
-	def commRqData(self, rQName, trCode, prevNext, screenNo):
+	def kw_commRqData(self, rQName, trCode, prevNext, screenNo):
 		return self.ocx.dynamicCall("CommRqData(QString, QString, int, QString)", rQName, trCode, prevNext, screenNo)
 
 	# 수신 받은 데이터의 반복 개수를 반환한다.
 	@pyqtSlot(str, str, result=int)
-	def getRepeatCnt(self, trCode, recordName):
+	def kw_getRepeatCnt(self, trCode, recordName):
 		return self.ocx.dynamicCall("GetRepeatCnt(QString, QString)", trCode, recordName)
 
 	# Tran 데이터, 실시간 데이터, 체결잔고 데이터를 반환한다.
@@ -231,7 +225,7 @@ class Kiwoom(QObject):
 	# nIndex : ItemIndex
 	# sInnerFieldName:사용안함
 	@pyqtSlot(str, str, str, int, str, result=str)
-	def commGetData(self, jongmokCode, realType, fieldName, index, innerFieldName):
+	def kw_commGetData(self, jongmokCode, realType, fieldName, index, innerFieldName):
 		return self.ocx.dynamicCall("CommGetData(QString, QString, QString, int, QString)", jongmokCode, realType, fieldName, index, innerFieldName).strip()
 
 	# strRealType – 실시간 구분
@@ -239,7 +233,7 @@ class Kiwoom(QObject):
 	# Ex) 현재가출력 - openApi.GetCommRealData(“주식시세”, 10);
 	# 참고)실시간 현재가는 주식시세, 주식체결 등 다른 실시간타입(RealType)으로도 수신가능
 	@pyqtSlot(str, int, result=str)
-	def getCommRealData(self, realType, fid):
+	def kw_getCommRealData(self, realType, fid):
 		return self.ocx.dynamicCall("GetCommRealData(QString, int)", realType, fid).strip()
 
 	# 주식 주문을 서버로 전송한다.
@@ -260,24 +254,24 @@ class Kiwoom(QObject):
 	# 매수 취소 - openApi.SendOrder(“RQ_1”, “0101”, “5015123410”, 3, “000660”, 10, “00”, “2”);
 	# sOrgOrderNo – 원주문번호
 	@pyqtSlot(str, str, str, int, str, int, int, str, str, result=int)
-	def sendOrder(self, rQName, screenNo, accNo, orderType, code, qty, price, hogaGb, orgOrderNo ):
+	def kw_sendOrder(self, rQName, screenNo, accNo, orderType, code, qty, price, hogaGb, orgOrderNo ):
 		return self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)", [rQName, screenNo, accNo, orderType, code, qty, price, hogaGb, orgOrderNo])
 
 	# 체결잔고 데이터를 반환한다.
 	@pyqtSlot(int, result=str)
-	def getChejanData(self, fid):
+	def kw_getChejanData(self, fid):
 		return self.ocx.dynamicCall("GetChejanData(int)", fid)
 
 	# 서버에 저장된 사용자 조건식을 가져온다.
 	@pyqtSlot(result=int)
-	def getConditionLoad(self):
+	def kw_getConditionLoad(self):
 		return self.ocx.dynamicCall("GetConditionLoad()")
 
 	# 조건검색 조건명 리스트를 받아온다.
 	# 조건명 리스트(인덱스^조건명)
 	# 조건명 리스트를 구분(“;”)하여 받아온다
 	@pyqtSlot(result=str)
-	def getConditionNameList(self):
+	def kw_getConditionNameList(self):
 		return self.ocx.dynamicCall("GetConditionNameList()")
 
 	# 조건검색 종목조회TR송신한다.
@@ -360,5 +354,5 @@ class Kiwoom(QObject):
 	# strCode – 종목코드
 	# 종목한글명
 	@pyqtSlot(str, result=str)
-	def getMasterCodeName(self, code):
+	def kw_getMasterCodeName(self, code):
 		return self.ocx.dynamicCall("GetMasterCodeName(QString)", code)

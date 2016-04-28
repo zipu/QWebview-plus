@@ -1,12 +1,15 @@
 # QWebview-plus
  - 키움 오픈 API+ for JavaScript를 지원하는 Webkit2 기반의 WebView
+ - Chrome45 지원 (Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/5.6.0 Chrome/45.0.2454.101 Safari/537.36)
  - ES5 지원
+ - ES6 지원 (http://kangax.github.io/compat-table/es6/#chrome45)
+
 
 ## Development Environment
- - Windows 32bit
+ - Windows 32bit 권장
  - 키움증권 Open API+ (https://www1.kiwoom.com/nkw.templateFrameSet.do?m=m1408000000)
- - Python 3.4.4 (https://www.python.org/downloads/release/python-344/)
- - pyQt5 (http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.5.1/PyQt5-5.5.1-gpl-Py3.4-Qt5.5.1-x32.exe)
+ - Python 3.5.1 32bit (https://www.python.org/ftp/python/3.5.1/python-3.5.1.exe)
+ - pyQt5.6 32bit (http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.6/PyQt5-5.6-gpl-Py3.5-Qt5.6.0-x32-2.exe)
 
 ## 키움 Open API+를 제공하는 kiwoom 객체 제공
 
@@ -35,10 +38,11 @@
 
 ## 사용 예
 ```bash
-python wnd.py [실행할 html 파일명]
+python main.py -f [실행할 html 파일명] -p 8888
 ```
-
 > 실행할 파일을 입력하지 않을 경우, 기본적으로 index.html을 부른다.
+> -p 크롬 원격 디버깅 포트 (기본: 8888)
+> -f 시작 페이지 경로 (기본: ./index.html)
 
 ## [Kiwoom-Helper](https://github.com/sculove/Kiwoom-Helper) 유틸
 QWebview-Plus에서 제공하는 kiwoom 객체와 이벤트를 손쉽게 사용할 수 있는 유틸
@@ -47,7 +51,3 @@ QWebview-Plus에서 제공하는 kiwoom 객체와 이벤트를 손쉽게 사용�
 ## License
 Licensed under MIT:
 https://opensource.org/licenses/MIT
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/sculove/qwebview-plus/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
