@@ -2,6 +2,7 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from PyQt5.QAxContainer import QAxWidget
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWebChannel import QWebChannel
 
 from plus.web import WebViewPlus
 from plus import util
@@ -17,11 +18,16 @@ class KiwoomWebViewPlus(WebViewPlus):
 		self.urlChanged.connect(self._OnUrlChanged)
 
 	def _OnUrlChanged(self, url):
-		self.page().mainFrame().addToJavaScriptWindowObject("kiwoom", self._kiwoom)
+		#self.page().mainFrame().addToJavaScriptWindowObject("kiwoom", self._kiwoom)
+		self.webchannel = QWebChannel(self.page())
+		self.page().setWebChannel(self.webchannel)
+		self.webchannel.registerObject("kiwoom", self._kiwoom)
 
 
 class Kiwoom(QObject):
-	OnEventConnect = pyqtSignal([int], ['QString'])
+	#OnEventConnect = pyqtSignal([int], ['QString'])
+	fireEvent = pyqtSignal(str, str)
+	loginEvent = pyqtSignal(str, str)
 
 	def __init__(self, view):
 		super().__init__()
@@ -50,16 +56,19 @@ class Kiwoom(QObject):
 	# 통신 연결 상태 변경시 이벤트
 	# nErrCode가 0이면 로그인 성공, 음수면 실패
 	def _OnEventConnect(self, errCode):
-		self.view.fireEvent("eventConnect.kiwoom", errCode)
+		#self.view.fireEvent("eventConnect.kiwoom", errCode)
+		data = json.dumps(errCode, ensure_ascii=False)
+		self.loginEvent.emit("eventConnect.kiwoom", data)
 
 	# 수신 메시지 이벤트
 	def _OnReceiveMsg(self, scrNo, rQName, trCode, msg):
-		self.view.fireEvent("receiveMsg.kiwoom", {
+		data = json.dumps({
 			"scrNo" : scrNo,
 			"rQName" : rQName,
 			"trCode": trCode,
 			"msg" : msg
-		})
+		}, ensure_ascii=False)
+		self.fireEvent.emit("receiveMsg.kiwoom", str(data))
 
 	# Tran 수신시 이벤트
 	def _OnReceiveTrData(self, scrNo, rQName , trCode, recordName, prevNext, dataLength, errorCode, message, splmMsg):
@@ -67,7 +76,7 @@ class Kiwoom(QObject):
 		# sErrorCode – 1.0.0.1 버전 이후 사용하지 않음.
 		# sMessage – 1.0.0.1 버전 이후 사용하지 않음.
 		# sSplmMsg - 1.0.0.1 버전 이후 사용하지 않음.
-		self.view.fireEvent("receiveTrData.kiwoom", {
+		data = json.dumps({
 			"scrNo" : scrNo,
 			"rQName" : rQName,
 			"trCode": trCode,
@@ -77,32 +86,36 @@ class Kiwoom(QObject):
 			# "errorCode" : errorCode,
 			# "message" : message,
 			# "splmMsg" : splmMsg
-		})
+		}, ensure_ascii=False)
+		self.fireEvent.emit("receiveTrData.kiwoom", data)
 
 	# 실시간 시세 이벤트
 	def _OnReceiveRealData(self, jongmokCode, realType, realData):
-		self.view.fireEvent("receiveRealData.kiwoom", {
+		data = json.dumps({
 			"jongmokCode" : jongmokCode,
 			"realType" : realType,
 			"realData": realData
-		})
+		}, ensure_ascii=False)
+		self.fireEvent.emit("receiveRealData.kiwoom", data)
 
 	# 체결데이터를 받은 시점을 알려준다.
 	# sGubun – 0:주문체결통보, 1:잔고통보, 3:특이신호
 	# sFidList – 데이터 구분은 ‘;’ 이다.
 	def _OnReceiveChejanData(self, gubun, itemCnt, fidList):
-		self.view.fireEvent("receiveChejanData.kiwoom", {
+		data = json.dumps({
 			"gubun" : gubun,
 			"itemCnt" : itemCnt,
 			"fidList": fidList
-		})
+		}, ensure_ascii=False)
+		self.fireEvent.emit("receiveChejanData.kiwoom", data)
 
 	# 로컬에 사용자조건식 저장 성공여부 응답 이벤트
 	def _OnReceiveConditionVer(self, ret, msg):
-		self.view.fireEvent("receiveConditionVer.kiwoom", {
+		data = json.dumps({
 			"ret" : ret,
 			"msg" : msg
-		})
+		}, ensure_ascii=False)
+		self.fireEvent.emit("receiveConditionVer.kiwoom", data)
 
 	# 조건검색 조회응답으로 종목리스트를 구분자(“;”)로 붙어서 받는 시점.
 	# LPCTSTR sScrNo : 종목코드
@@ -111,13 +124,28 @@ class Kiwoom(QObject):
 	# int nIndex : 조건명 인덱스
 	# int nNext : 연속조회(2:연속조회, 0:연속조회없음)
 	def _OnReceiveTrCondition(self, scrNo, codeList, conditionName, index, next):
-		self.view.fireEvent("receiveTrCondition.kiwoom", {
+		data = json.dumps({
 			"scrNo" : scrNo,
 			"codeList" : codeList,
 			"conditionName" : conditionName,
 			"index" : index,
 			"next" : next,
-		})
+		}, ensure_ascii=False)
+		self.fireEvent.emit("receiveTrCondition.kiwoom",data)
+
+	# 편입, 이탈 종목이 실시간으로 들어옵니다.
+	# strCode : 종목코드
+	# strType : 편입(“I”), 이탈(“D”)
+	# strConditionName : 조건명
+	# strConditionIndex : 조건명 인덱스
+	def _OnReceiveRealCondition(self, code, type, conditionName, conditionIndex):
+		data = json.dumps({
+			"code" : code,
+			"type" : type,
+			"conditionName" : conditionName,
+			"conditionIndex" : conditionIndex
+		}, ensure_ascii=False)
+		self.fireEvent.emit("receiveRealCondition.kiwoom", data)
 
 	# 편입, 이탈 종목이 실시간으로 들어옵니다.
 	# strCode : 종목코드
@@ -207,8 +235,8 @@ class Kiwoom(QObject):
 		return self.ocx.dynamicCall("CommGetData(QString, QString, QString, int, QString)", jongmokCode, realType, fieldName, index, innerFieldName).strip()
 
 	# strRealType – 실시간 구분
-    # nFid – 실시간 아이템
-    # Ex) 현재가출력 - openApi.GetCommRealData(“주식시세”, 10);
+	# nFid – 실시간 아이템
+	# Ex) 현재가출력 - openApi.GetCommRealData(“주식시세”, 10);
 	# 참고)실시간 현재가는 주식시세, 주식체결 등 다른 실시간타입(RealType)으로도 수신가능
 	@pyqtSlot(str, int, result=str)
 	def getCommRealData(self, realType, fid):

@@ -2,7 +2,8 @@
 #-*-coding: utf-8 -*-
 import sys
 import os.path
-from PyQt5.QtCore import *
+from optparse import OptionParser
+from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QSplitter, QMessageBox
 from plus.kiwoom import KiwoomWebViewPlus
 
@@ -14,7 +15,7 @@ class Window(QMainWindow):
         self.view = KiwoomWebViewPlus()
         self.setCentralWidget(self.view)
 
-        self.view.devTool.setVisible(True)
+        #self.view.devTool.setVisible(True)
 
         # view split
         # self.splitter = QSplitter(self)
@@ -35,10 +36,15 @@ class Window(QMainWindow):
             event.ignore()
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        entryfle = "index.html" if os.path.isfile("index.html") else ""
+    #parsing command line arguments
+    parser = OptionParser()
+    parser.add_option("--remote-debugging-port", action="store", type="string", dest="port")
+    (opt, arg) = parser.parse_args()
+
+    if len(arg) > 0:
+        entryfle = arg[0]
     else:
-        entryfle = sys.argv[1]
+        entryfle = "index.html" if os.path.isfile("index.html") else ""
 
     if entryfle:
         app = QApplication(sys.argv)
