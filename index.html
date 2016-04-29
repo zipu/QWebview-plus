@@ -23,29 +23,26 @@ Date.prototype.yyyymmdd = function()
 "use strict";
 // QWebchannel 사용 예
 new QWebChannel(qt.webChannelTransport, function(channel){
-    var kiwoom = window.kiwoom = channel.objects.kiwoom;
+    let kiwoom = window.kiwoom = channel.objects.kiwoom;
 
-    // Invoke a method:
-    for(var p in kiwoom) {
+    // 메소드 호출
+    for(let p in kiwoom) {
         // kw_로 시작 하는 메소드
         if(p.startsWith("kw_")) {
             let name = p.substring(p.indexOf("kw_") + 3);
             let orgName = p;
-            console.info(name, orgName);
-            window.kiwoom[name]= () => {
-                console.log(name, orgName);
-                // 아규먼트를 어떻게 받을것 인가?
+            window.kiwoom[name]= function() {
                 let methodArgs = Array.prototype.slice.call(arguments);
-                console.warn(methodArgs);
-                return new Promise( (resolve, reject) => {
-                    kiwoom[orgName](ret => resolve(ret));
+                return new Promise( resolve => {
+                    methodArgs.push(ret => resolve(ret));
+                    kiwoom[orgName].apply(kiwoom, methodArgs);
                 });
             };
         }
     }
     // 이벤트 처리
     kiwoom.bridge.connect(function(eventName, data){
-        var event = document.createEvent("CustomEvent");
+        let event = document.createEvent("CustomEvent");
         event.initCustomEvent(eventName, true, true, data );
         document.dispatchEvent(event);
     });
