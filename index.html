@@ -21,54 +21,20 @@ Date.prototype.yyyymmdd = function()
 </div>
 <script>
 "use strict";
-// QWebchannel 사용 예
-new QWebChannel(qt.webChannelTransport, function(channel){
-    let kiwoom = window.kiwoom = channel.objects.kiwoom;
-
-    // 메소드 호출
-    for(let p in kiwoom) {
-        // kw_로 시작 하는 메소드
-        if(p.startsWith("kw_")) {
-            let name = p.substring(p.indexOf("kw_") + 3);
-            let orgName = p;
-            window.kiwoom[name]= function() {
-                let methodArgs = Array.prototype.slice.call(arguments);
-                return new Promise( resolve => {
-                    methodArgs.push(ret => resolve(ret));
-                    kiwoom[orgName].apply(kiwoom, methodArgs);
-                });
-            };
-        }
-    }
-    // 이벤트 처리
-    kiwoom.bridge.connect(function(eventName, data){
-        let event = document.createEvent("CustomEvent");
-        event.initCustomEvent(eventName, true, true, data );
-        document.dispatchEvent(event);
-    });
-});
-
 var $code = $("#stockcode");
 
 $("#search").click(function(e) {
-    // kiwoom.getConnectState(function(state){
-    //     if(status == 0) {
-    //         kiwoom.commConnect(function(){
-    //             kiwoom.loginEvent.connect(function(event, errCode){
-    //                 if (errCode == 0) console.log("로그인 성공");
-    //                 else console.log('로그인 실패 (errCode: '+errCode+')');
-    //             })
-    //         });
-    //     } else if (status ==1 ){
-    //         search();
-    //     }
-    // });
+    kiwoom.getConnectState().then( status => {
+        if(status == 0) {
+            kiwoom.commConnect();
+        } else if(status == 1) {
+            search();
+        }
+    });
 });
 
 $("#chart").click(function(e) {
-    console.log("state");
     kiwoom.getConnectState().then( status => {
-        console.log("status--->", status);
         if(status == 0) {
             kiwoom.commConnect();
         } else if(status == 1) {
@@ -81,8 +47,7 @@ document.addEventListener("eventConnect.kiwoom", function(e) {
     var errcode = e.detail;
     if(errcode == 0) {
         console.info("로그인 완료", errcode);
-        // console.log(kiwoom.getLoginInfo("ACCNO").replace(/;$/,"").split(";"));
-        kiwoom.getLoginInfo("ACCNO").then(ret => console.log(ret));
+        kiwoom.getLoginInfo("ACCNO").then(ret => console.log(ret.replace(/;$/,"").split(";")));
     } else {
         console.error(kiwoom.parseErrorCode(errcode));
     }
@@ -100,10 +65,11 @@ document.addEventListener("receiveMsg.kiwoom", function(e) {
 
 document.addEventListener("receiveTrData.kiwoom", function(e) {
     var data = e.detail;
-    var len = kiwoom.getRepeatCnt(data.trCode, data.rQName);
-    console.info( data.rQName, data.trCode, len );
+    console.log(data);
 
-    switch(data.trCode) {
+    kiwoom.getRepeatCnt(data.trCode, data.rQName).then( len => {
+        console.log(len);
+        switch(data.trCode) {
         case "opt10001" :
             for(var i=0; i<len; i++) {
                 console.log("TR 데이터",{
@@ -117,7 +83,8 @@ document.addEventListener("receiveTrData.kiwoom", function(e) {
         case "opt10081" :
             console.log("TR 데이터", JSON.parse(kiwoom.getCommDataEx(data.trCode, data.rQName)));
             break;
-    }
+        }
+    });
 });
 
 document.addEventListener("receiveRealData.kiwoom", function(e) {
@@ -134,9 +101,10 @@ document.addEventListener("receiveRealData.kiwoom", function(e) {
 
 // 종목 TR 검색
 function search() {
-    kiwoom.setInputValue("종목코드", $code.val());
-    // rQName과 화면번호는 사용자가 지정하여 구분하는 값
-    kiwoom.commRqData("주식기본정보", "opt10001", 0, "0001");
+    kiwoom.setInputValue("종목코드", $code.val()).then(() => {
+        // rQName과 화면번호는 사용자가 지정하여 구분하는 값
+        return kiwoom.commRqData("주식기본정보", "opt10001", 0, "0001")
+    }).then(() => console.log("검색 시작..."));
 }
 
 function chart() {

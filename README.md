@@ -1,5 +1,5 @@
 # QWebview-plus
- - 키움 오픈 API+ for JavaScript를 지원하는 Webkit2 기반의 WebView
+ - 키움 오픈 API+ for JavaScript를 지원하는 Chromium 기반의 WebView
  - Chrome45 지원 (Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/5.6.0 Chrome/45.0.2454.101 Safari/537.36)
  - ES5 지원
  - ES6 지원 (http://kangax.github.io/compat-table/es6/#chrome45)
@@ -41,8 +41,8 @@
 python main.py -f [실행할 html 파일명] -p 8888
 ```
 > 실행할 파일을 입력하지 않을 경우, 기본적으로 index.html을 부른다.
-> -p 크롬 원격 디버깅 포트 (기본: 8888)
-> -f 시작 페이지 경로 (기본: ./index.html)
+> - -f 시작 페이지 경로 (기본: ./index.html)
+> - -p 크롬 원격 디버깅 포트
 
 ## [Kiwoom-Helper](https://github.com/sculove/Kiwoom-Helper) 유틸
 QWebview-Plus에서 제공하는 kiwoom 객체와 이벤트를 손쉽게 사용할 수 있는 유틸

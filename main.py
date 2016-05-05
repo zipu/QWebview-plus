@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #-*-coding: utf-8 -*-
 import sys
-import os
+import os.path
 import configparser
 from optparse import OptionParser
 from PyQt5.QtCore import QUrl
@@ -26,15 +26,20 @@ class Window(QMainWindow):
 if __name__ == "__main__":
     #parsing command line arguments
     parser = OptionParser()
-    parser.add_option("-p", "--port", action="store", type="string", dest="port", help="크롬 원격 디버깅 포트", default="8888")
+    parser.add_option("-p", "--port", action="store", type="string", dest="port", help="크롬 원격 디버깅 포트")
     parser.add_option("-f", "--file", action="store", type="string", dest="file", help="시작 파일 경로", default="./index.html")
     (opt, args) = parser.parse_args()
 
-    os.environ["QTWEBENGINE_REMOTE_DEBUGGING"] = str(opt.port);
     if os.path.isfile(opt.file):
+        # application 이 실행하기 전에 port 가 처리되어야 한다.
+        if opt.port is not None:
+            os.environ["QTWEBENGINE_REMOTE_DEBUGGING"] = "0.0.0.0:" + str(opt.port)
+
         app = QApplication(sys.argv)
         window = Window()
         window.view.load(QUrl.fromLocalFile(os.path.join(os.path.dirname( os.path.abspath( __file__ ) ), opt.file)))
+        if opt.port is not None:
+            window.view.debuggingMode(opt.port)
         window.show()
         sys.exit(app.exec_())
     else:
