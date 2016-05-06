@@ -13,7 +13,6 @@ new QWebChannel(qt.webChannelTransport, function(channel){
             let orgFn = window.kiwoom[p];
             window.kiwoom[p] = function() {
                 let methodArgs = Array.prototype.slice.call(arguments);
-                console.info(methodArgs);
                 return new Promise( resolve => {
                     methodArgs.push(ret => resolve(ret));
                     orgFn.apply(kiwoom, methodArgs);
