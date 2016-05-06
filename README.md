@@ -17,8 +17,18 @@
  - [키움 오픈 API](https://download.kiwoom.com/web/openapi/kiwoom_openapi_plus_devguide_ver_1.1.pdf)와 동일한 메소드를 제공
  - 키움 오픈 API와 네이밍 규칙이 다름
     - 첫 문자가 대문자 아닌 소문자
+      ```js
+      CommConnect => commConnect
       ```
-      예) CommConnect => commConnect
+    - 모든 메소드의 반환값은 Promise 객체
+      ```js
+      kiwoom.getConnectState().then( status => {
+        if(status == 0) {
+            kiwoom.commConnect();
+        } else if(status == 1) {
+            chart();
+        }
+      });
       ```
 
 ### 이벤트
@@ -28,7 +38,7 @@
     - `kiwoom` 이라는 event namespace가 붙음
     - 이벤트 명에서 `on`이라는 prefix가 제거하고, 첫 문자를 소문자로 변경
       ```
-      예) OnReceiveTrData => receiveTrData.kiwoom
+      OnReceiveTrData => receiveTrData.kiwoom
       ```
     - 이벤트에 의해 전달되는 속성은 detail에 포함되어 전달됨
     - 이벤트에 전달되는 속성명은 타입약어가 제거되고, 첫 문자를 소문자로 변경
@@ -41,6 +51,7 @@
 python main.py -f [실행할 html 파일명] -p 8888
 ```
 > 실행할 파일을 입력하지 않을 경우, 기본적으로 index.html을 부른다.
+>
 > - -f 시작 페이지 경로 (기본: ./index.html)
 > - -p 크롬 원격 디버깅 포트
 
@@ -50,4 +61,7 @@ QWebview-Plus에서 제공하는 kiwoom 객체와 이벤트를 손쉽게 사용�
 
 ## License
 Licensed under MIT:
+
 https://opensource.org/licenses/MIT
+
+
