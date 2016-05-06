@@ -9,12 +9,14 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from plus.kiwoom import KiwoomWebViewPlus
 
 class Window(QMainWindow):
-    def __init__(self):
+    def __init__(self, port=None):
         super().__init__()
         self.setMinimumSize(680,480)
         self.setWindowTitle("QWebview-plus for Kiwoom")
         self.view = KiwoomWebViewPlus()
         self.setCentralWidget(self.view)
+        if port is not None:
+            self.view.debuggingMode(port)
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Message', "Are you sure to quit?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
@@ -36,10 +38,10 @@ if __name__ == "__main__":
             os.environ["QTWEBENGINE_REMOTE_DEBUGGING"] = "0.0.0.0:" + str(opt.port)
 
         app = QApplication(sys.argv)
-        window = Window()
+        window = Window(opt.port)
         window.view.load(QUrl.fromLocalFile(os.path.join(os.path.dirname( os.path.abspath( __file__ ) ), opt.file)))
-        if opt.port is not None:
-            window.view.debuggingMode(opt.port)
+        #if opt.port is not None:
+        #    window.view.debuggingMode(opt.port)
         window.show()
         sys.exit(app.exec_())
     else:
